@@ -9,6 +9,7 @@ a company **workspace**. This repo shows the fictional demo workspace **Northwin
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — how the app is built (Design Components; static, no build step)
 - [`docs/DESIGN_SYSTEM.md`](./docs/DESIGN_SYSTEM.md) — type, colour, components
 - [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) — Cloudflare Pages
+- [`docs/WORKFLOW.md`](./docs/WORKFLOW.md) — designing in the Claude tool → shipping from the repo
 - [`docs/BACKEND_AND_SYNC.md`](./docs/BACKEND_AND_SYNC.md) — the multiplayer Worker plan + secrets
 - [`docs/ROADMAP.md`](./docs/ROADMAP.md) — status & what's next
 
