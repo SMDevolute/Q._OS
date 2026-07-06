@@ -62,6 +62,24 @@ PATCH  /api/orgs/:id/members/:userId  { role }                     → admin+
 DELETE /api/orgs/:id/members/:userId                               → admin+  (Evolute churn = remove membership)
 POST   /api/orgs/invites/accept  { token }
 ```
+
+## API surface (Phase 2 — domain data)
+All nested under an org you're a member of. **GET** needs role ≥ viewer; **POST/PATCH/DELETE** need
+role ≥ member (viewer is rejected). Deletes are soft where the table has `deleted_at`.
+```
+GET|POST         /api/orgs/:orgId/rounds            fields: name,kind,target_amount,currency,premoney,status,open_date,target_close,is_active
+GET|POST         /api/orgs/:orgId/firms             fields: name,type,website,description,location            ?type=
+GET|POST         /api/orgs/:orgId/contacts          fields: firm_id,name,title,email,phone,linkedin,is_primary ?firm_id=
+GET|POST         /api/orgs/:orgId/deals             fields: round_id,firm_id,stage,owner_user_id,confidence,role,ticket_target,sort_order,next_step,next_step_due  ?round_id= ?firm_id= ?stage=
+GET|POST         /api/orgs/:orgId/commitments       fields: deal_id,amount,currency,instrument,status,committed_at  ?deal_id=
+GET|POST         /api/orgs/:orgId/notes             fields: subject_type,subject_id,body,pinned               ?subject_type= ?subject_id=
+GET|POST         /api/orgs/:orgId/tasks             fields: title,assignee_id,due_at,status,subject_type,subject_id  ?status= ?assignee_id=
+PATCH|DELETE     /api/orgs/:orgId/<resource>/:id
+POST             /api/orgs/:orgId/deals/reorder     { updates:[{id,stage,sort_order}] }   -- kanban drag
+```
+Money fields are integer minor units (cents); timestamps are unix seconds. List responses are
+`{ "<resource>": [...] }`; single-item responses are `{ "<singular>": {...} }`.
+See `../docs/FRONTEND_INTEGRATION.md` for porting the Acquire UI onto these.
 Email links land on the app with `#magic_link=…`, `#password_reset=…`, or `#invite=…` in the URL;
 the frontend reads the fragment and POSTs it to the matching `consume`/`reset`/`accept` endpoint.
 
