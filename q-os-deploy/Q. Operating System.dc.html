@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FBFAF8; color: #192432; font-family: "Inter", system-ui, sans-serif; font-weight: 300; }
+  button, a { font-family: inherit; }
+
+  /* ── Landing / entry ── */
+  .land { height: 100vh; overflow: hidden; background: #FBFAF8; display: flex; flex-direction: column; color: #192432; }
+  .land-top { height: 3px; background: #192432; flex: none; }
+  .land-hd { display: flex; align-items: center; justify-content: space-between; padding: 16px 56px 0; flex: none; }
+  .land-brand { font-family: "Space Grotesk", sans-serif; font-size: 32px; font-weight: 400; line-height: 1; display: flex; align-items: flex-end; color: #192432; letter-spacing: -0.01em; }
+  .land-dot { width: 7px; height: 7px; border-radius: 50%; background: #192432; margin: 0 0 5px 3px; }
+  .land-hd-r { display: flex; align-items: center; gap: 24px; }
+  .land-signin { font-size: 14px; font-weight: 500; color: #192432; background: none; border: none; cursor: pointer; padding: 8px 2px; }
+  .land-signin:hover { color: #2B5C87; }
+  .land-demo { font-size: 13.5px; font-weight: 500; color: #192432; background: #fff; border: 1px solid #d3cfc4; border-radius: 9px; padding: 10px 20px; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
+  .land-demo:hover { background: #192432; color: #fff; }
+  .land-main { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 1120px; margin: 0 auto; padding: 16px 56px; box-sizing: border-box; min-height: 0; }
+  .land-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #adb0b6; margin: 0 0 16px; }
+  .land-h1 { font-family: "Space Grotesk", sans-serif; font-size: 42px; line-height: 1.08; font-weight: 400; letter-spacing: -0.02em; color: #192432; margin: 0 0 16px; max-width: 16ch; text-wrap: balance; }
+  .land-subp { font-size: 16px; line-height: 1.55; font-weight: 300; color: #6b7480; max-width: 46ch; margin: 0 0 20px; }
+  .land-cta { font-size: 14px; font-weight: 500; color: #fff; background: #192432; border: none; border-radius: 10px; padding: 12px 22px; cursor: pointer; letter-spacing: 0.01em; align-self: flex-start; }
+  .land-cta:hover { background: #0f1721; }
+  .land-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 34px 0 0; }
+  .land-card { background: #fff; border: 1px solid #eae7e0; border-radius: 12px; padding: 20px 22px 22px; display: flex; flex-direction: column; }
+  .land-card-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .land-card-t { font-family: "Space Grotesk", sans-serif; font-size: 20px; font-weight: 400; letter-spacing: -0.01em; color: #192432; margin: 0; line-height: 1.15; }
+  .land-badge { flex: none; font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; border-radius: 20px; padding: 3px 9px; margin-top: 4px; white-space: nowrap; }
+  .land-badge.live { color: #2f7d4f; background: #e3f0e6; }
+  .land-badge.prep { color: #2B5C87; background: #dde9f3; }
+  .land-badge.road { color: #8a8f97; background: #ece9e3; }
+  .land-card-d { font-size: 13.5px; line-height: 1.5; color: #4a5260; font-weight: 300; margin: 12px 0 0; }
+  .land-card-rule { height: 1px; background: #eceae4; margin: auto 0 12px; }
+  .land-card-meta { font-size: 12px; line-height: 1.5; color: #a4a8af; }
+  .land-note { font-size: 12.5px; line-height: 1.55; color: #adb0b6; font-weight: 300; margin: 18px 0 0; max-width: 62ch; }
+  .land-foot { border-top: 1px solid #e6e3dc; padding: 16px 56px; flex: none; display: flex; align-items: center; justify-content: space-between; }
+  .land-foot-l { display: flex; align-items: center; gap: 12px; }
+  .land-foot-l .pwr { font-size: 11px; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase; color: #9a9ea6; }
+  .land-foot-l img { height: 17px; width: auto; display: block; }
+  .land-foot-r { font-size: 12.5px; color: #a4a8af; letter-spacing: 0.01em; }
+  @media (max-width: 940px) {
+    .land-cards { grid-template-columns: 1fr; overflow: auto; }
+    .land-h1 { font-size: 38px; }
+    .land-hd, .land-main, .land-foot { padding-left: 28px; padding-right: 28px; }
+    .land { height: auto; min-height: 100vh; overflow: visible; }
+  }
+
+  /* ── Workspace shell (post sign-in) ── */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 264px; flex: none; background: #f4f3ef; border-right: 1px solid #e6e3dc; padding: 26px 16px 18px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+  .side-brand { font-family: "Space Grotesk", sans-serif; font-size: 38px; font-weight: 400; line-height: 0.9; color: #121923; padding-left: 5px; display: flex; align-items: flex-end; }
+  .q-dot { width: 7px; height: 7px; border-radius: 50%; background: #121923; margin: 0 0 3px 4px; }
+  .q-word { font-family: "Inter", sans-serif; font-size: 9px; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: #989CA3; white-space: nowrap; padding-left: 6px; margin-top: 9px; }
+
+  .side-nav { margin-top: 8px; display: flex; flex-direction: column; gap: 1px; flex: 1 1 auto; overflow-y: auto; margin-right: -8px; padding-right: 8px; }
+  .side-nav::-webkit-scrollbar { width: 6px; }
+  .side-nav::-webkit-scrollbar-thumb { background: #dedacf; border-radius: 3px; }
+  .nav-sec { font-family: "Inter", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #C2BCAD; padding: 18px 12px 7px; }
+  .nav-sec:first-child { padding-top: 10px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; text-align: left; width: 100%; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 500; color: #414a5a; background: none; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; text-decoration: none; line-height: 1.25; }
+  .nav-item:hover { background: #eceae4; color: #192432; }
+  .nav-item.on { background: #fff; color: #121923; font-weight: 600; box-shadow: 0 1px 2px rgba(25,36,50,0.06); }
+  .nav-ico { flex: none; width: 15px; height: 15px; color: #98A0AC; }
+  .nav-item.on .nav-ico { color: #2B5C87; }
+  .nm-name { flex: 1 1 auto; }
+  .nm-badge { flex: none; font-size: 8.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; }
+  .nm-badge.live { color: #2F7D5B; background: #E7F2EC; }
+  .nm-badge.prep { color: #1E466B; background: #D3E2F0; }
+  .nm-badge.road { color: #8a8f97; background: #EDEBE4; }
+  .nav-parent { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 500; color: #414a5a; background: none; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+  .nav-parent:hover { background: #eceae4; color: #192432; }
+  .nav-parent.active { color: #121923; font-weight: 600; }
+  .nav-chev { flex: none; width: 7px; height: 7px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(-45deg); transition: transform .16s ease; opacity: .45; margin-left: 2px; }
+  .nav-parent.open .nav-chev { transform: rotate(45deg); }
+  .nav-sub { display: flex; flex-direction: column; gap: 1px; margin: 1px 0 4px; }
+  .nav-sub .nav-item { padding-left: 38px; font-size: 12.5px; font-weight: 500; color: #5b6472; }
+  .nav-sub .nav-item.on { color: #121923; font-weight: 600; }
+
+  .side-foot { margin-top: 14px; display: flex; flex-direction: column; gap: 14px; padding-top: 15px; border-top: 1px solid #e6e3dc; }
+  .side-client { padding: 2px 2px 0; }
+  .side-client-l { font-family: "Inter", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #aeb4bd; margin-bottom: 3px; }
+  .side-client-n { font-family: "Inter", sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #121923; }
+  .side-signout { font-family: "Inter", sans-serif; font-size: 11px; font-weight: 500; color: #8a8f97; background: none; border: none; padding: 0; cursor: pointer; text-align: left; }
+  .side-signout:hover { color: #2B5C87; text-decoration: underline; }
+  .prep { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+  .prep-l { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #989CA3; line-height: 1; }
+  .side-logo-foot { height: 13px; width: auto; display: block; opacity: 0.75; }
+
+  .content { flex: 1 1 auto; min-width: 0; height: 100vh; overflow: auto; }
+
+  /* ── View scaffolding ── */
+  .view { padding: 54px clamp(28px, 4.2vw, 66px) 96px; max-width: 1160px; }
+  .view-eyebrow { font-family: "Inter", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #989CA3; margin: 0 0 14px; }
+  h1.view-h { font-family: "Space Grotesk", sans-serif; font-weight: 400; font-size: 36px; line-height: 1.05; letter-spacing: -0.025em; color: #121923; margin: 0 0 12px; max-width: 20ch; }
+  .view-sub { font-size: 16px; color: #5b6472; margin: 0 0 40px; max-width: 58ch; line-height: 1.5; }
+  .view-sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 44px 0 16px; }
+  .view-sec-h h2 { font-family: "Space Grotesk", sans-serif; font-weight: 400; font-size: 21px; letter-spacing: -0.015em; color: #121923; margin: 0; }
+  .view-sec-h .sh-meta { font-size: 12.5px; color: #989CA3; }
+
+  /* KPI strip */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .kpi { background: #fff; border: 1px solid #e6e3dc; border-radius: 12px; padding: 18px 20px 17px; }
+  .kpi-l { font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9aa0a8; margin-bottom: 11px; }
+  .kpi-v { font-family: "Space Grotesk", sans-serif; font-size: 29px; font-weight: 400; letter-spacing: -0.02em; color: #121923; line-height: 1; }
+  .kpi-m { font-size: 12px; color: #8a8f97; margin-top: 8px; line-height: 1.4; }
+
+  /* Card / table container */
+  .panel { background: #fff; border: 1px solid #e6e3dc; border-radius: 14px; overflow: hidden; }
+  .panel-hd { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 24px; border-bottom: 1px solid #eceae4; }
+  .panel-hd h3 { font-family: "Space Grotesk", sans-serif; font-weight: 400; font-size: 18px; letter-spacing: -0.01em; color: #121923; margin: 0; }
+  .panel-hd .cnt { font-size: 12.5px; color: #989CA3; }
+
+  table.tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; font-family: "Inter", sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #adb0b6; padding: 12px 24px; border-bottom: 1px solid #eceae4; white-space: nowrap; }
+  .tbl th.num, .tbl td.num { text-align: right; }
+  .tbl td { padding: 15px 24px; border-bottom: 1px solid #f2f0ea; font-size: 13.5px; color: #414a5a; vertical-align: middle; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tbody tr:hover td { background: #fcfbf9; }
+  .d-name { font-weight: 600; color: #192432; font-size: 14px; }
+  .d-type { font-size: 12px; color: #8a8f97; margin-top: 2px; }
+  .num-strong { font-variant-numeric: tabular-nums; color: #192432; font-weight: 500; }
+  .num-mut { font-variant-numeric: tabular-nums; }
+
+  .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; display: inline-block; }
+  .tag.origination { color: #6b7480; background: #EDEBE4; }
+  .tag.marketing { color: #7a5a1c; background: #F1E7CF; }
+  .tag.diligence { color: #1E466B; background: #D9E5F1; }
+  .tag.closing { color: #2F7D5B; background: #E7F2EC; }
+
+  .cbar-wrap { display: flex; align-items: center; gap: 10px; }
+  .cbar { width: 84px; height: 6px; background: #edeae2; border-radius: 4px; overflow: hidden; flex: none; }
+  .cbar > i { display: block; height: 100%; background: #2F7D5B; border-radius: 4px; }
+  .cbar-pct { font-size: 12.5px; font-variant-numeric: tabular-nums; color: #5b6472; }
+
+  .mo { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #5b6472; }
+  .mo-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .mo.up .mo-dot { background: #2F7D5B; } .mo.up { color: #2F7D5B; }
+  .mo.flat .mo-dot { background: #b7bcc3; }
+  .mo.down .mo-dot { background: #B4552D; } .mo.down { color: #B4552D; }
+
+  .trend { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .trend.pos { color: #2F7D5B; } .trend.neg { color: #B4552D; } .trend.flat { color: #8a8f97; }
+
+  /* Two-column layout for market view */
+  .grid-2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 1040px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .txn { display: flex; flex-direction: column; }
+  .txn-row { padding: 15px 22px; border-bottom: 1px solid #f2f0ea; }
+  .txn-row:last-child { border-bottom: none; }
+  .txn-t { font-size: 13.5px; font-weight: 600; color: #192432; }
+  .txn-t b { font-weight: 600; }
+  .txn-m { font-size: 12px; color: #8a8f97; margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .txn-val { font-family: "Space Grotesk", sans-serif; font-size: 15px; color: #121923; }
+
+  /* Alerts feed */
+  .feed { max-width: 780px; }
+  .feed-day { font-size: 11px; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase; color: #adb0b6; margin: 34px 0 6px; }
+  .feed-day:first-child { margin-top: 0; }
+  .alert { display: flex; gap: 18px; padding: 17px 0; border-bottom: 1px solid #eeece6; }
+  .al-time { flex: none; width: 62px; font-size: 12px; color: #9aa0a8; padding-top: 3px; font-variant-numeric: tabular-nums; }
+  .al-body { flex: 1 1 auto; min-width: 0; }
+  .al-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-bottom: 8px; }
+  .al-tag.deadline { color: #7a5a1c; background: #F1E7CF; }
+  .al-tag.movement { color: #2F7D5B; background: #E7F2EC; }
+  .al-tag.market { color: #1E466B; background: #D9E5F1; }
+  .al-tag.document { color: #6b5aa0; background: #E8E4F2; }
+  .al-txt { font-size: 14px; color: #2a323e; line-height: 1.5; }
+  .al-rel { font-size: 12px; color: #9aa0a8; margin-top: 5px; }
+  .al-rel b { color: #5b6472; font-weight: 600; }
+
+  /* Placeholder pane */
+  .ph { padding: 64px clamp(28px, 4.2vw, 66px); max-width: 640px; }
+  .ph-desc { font-size: 16px; color: #4a5260; line-height: 1.6; margin: 0 0 26px; }
+  .ph-list { list-style: none; padding: 0; margin: 0 0 30px; border-top: 1px solid #eceae4; }
+  .ph-list li { padding: 13px 2px; border-bottom: 1px solid #eceae4; font-size: 14px; color: #414a5a; display: flex; gap: 11px; align-items: baseline; }
+  .ph-list li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #c3bdaf; flex: none; transform: translateY(-2px); }
+  .ph-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .ph-link { font-size: 13.5px; font-weight: 600; color: #fff; background: #192432; border: none; border-radius: 10px; padding: 11px 20px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .ph-link:hover { background: #0f1721; }
+  .ph-chip { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 11px; border-radius: 20px; }
+  .ph-chip.prep { color: #1E466B; background: #D3E2F0; }
+  .ph-chip.road { color: #8a8f97; background: #EDEBE4; }
+  .ph-chip.live { color: #2F7D5B; background: #E7F2EC; }
+
+  @media (max-width: 860px) {
+    .app { flex-direction: column; }
+    .sidebar { width: auto; height: auto; position: static; border-right: none; border-bottom: 1px solid #e6e3dc; }
+    .content { height: auto; overflow: visible; }
+    .view, .ph { padding: 36px 20px 72px; max-width: none; }
+    h1.view-h { font-size: 29px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</helmet>
+
+<sc-if value="{{ onLanding }}" hint-placeholder-val="{{ true }}">
+<div class="land">
+  <div class="land-top"></div>
+  <header class="land-hd">
+    <div class="land-brand">Q<span class="land-dot"></span></div>
+    <div class="land-hd-r">
+      <button class="land-signin" onClick="{{ enterApp }}">Sign in</button>
+      <button class="land-demo" onClick="{{ enterApp }}">Request a demo</button>
+    </div>
+  </header>
+  <main class="land-main">
+    <p class="land-eyebrow">The capital operating system</p>
+    <h1 class="land-h1">From first pitch to signed deal. And the deal after that.</h1>
+    <p class="land-subp">Raise a round, sell a company, refinance. One system runs every counterparty from first contact to signature, and beyond.</p>
+    <button class="land-cta" onClick="{{ enterApp }}">Enter workspace</button>
+    <div class="land-cards">
+      <div class="land-card">
+        <div class="land-card-h"><h2 class="land-card-t">Intelligence</h2><span class="land-badge live">Live</span></div>
+        <p class="land-card-d">Every live mandate, the market around it, and what moved today — one read-only glance across the desk.</p>
+        <div class="land-card-rule"></div>
+        <div class="land-card-meta">Cross-deal dashboard · Market · Alerts</div>
+      </div>
+      <div class="land-card">
+        <div class="land-card-h"><h2 class="land-card-t">Workflows</h2><span class="land-badge prep">Acquire · Close · Inform</span></div>
+        <p class="land-card-d">The deal lifecycle end to end. Acquire the round, close it in the dataroom, keep investors informed for the next.</p>
+        <div class="land-card-rule"></div>
+        <div class="land-card-meta">Acquire · Close · Inform investors</div>
+      </div>
+      <div class="land-card">
+        <div class="land-card-h"><h2 class="land-card-t">Documents &amp; data</h2><span class="land-badge road">Shared</span></div>
+        <p class="land-card-d">The substrate under every workflow — one investor database, one library, one register of record.</p>
+        <div class="land-card-rule"></div>
+        <div class="land-card-meta">Database · Library · Cap table · Templates</div>
+      </div>
+    </div>
+    <p class="land-note">Built by dealmakers, proven on live mandates. One workspace per company, every module the deal needs.</p>
+  </main>
+  <footer class="land-foot">
+    <div class="land-foot-l"><span class="pwr">Powered by</span><img src="assets/evolute-wordmark-dark.svg" alt="Evolute"></div>
+    <div class="land-foot-r">Intelligence · Workflows · Documents</div>
+  </footer>
+</div>
+</sc-if>
+
+<sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-brand">Q<span class="q-dot"></span></div>
+    <div class="q-word">Capital Operating Model</div>
+    <nav class="side-nav">
+
+      <div class="nav-sec">Intelligence</div>
+      <button class="nav-item {{ a.dash }}" onClick="{{ goDash }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"></rect><rect x="9" y="2" width="5" height="5" rx="1"></rect><rect x="2" y="9" width="5" height="5" rx="1"></rect><rect x="9" y="9" width="5" height="5" rx="1"></rect></svg>
+        <span class="nm-name">Cross-deal dashboard</span>
+      </button>
+      <button class="nav-item {{ a.market }}" onClick="{{ goMarket }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 11l3.5-3.5 2.5 2.5L14 4"></path><path d="M10.5 4H14v3.5"></path></svg>
+        <span class="nm-name">Market intelligence</span>
+      </button>
+      <button class="nav-item {{ a.alerts }}" onClick="{{ goAlerts }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2a4 4 0 0 0-4 4c0 3-1.2 4.2-1.2 4.2h10.4S12 9 12 6a4 4 0 0 0-4-4z"></path><path d="M6.8 13a1.4 1.4 0 0 0 2.4 0"></path></svg>
+        <span class="nm-name">Alerts &amp; signals</span>
+      </button>
+
+      <div class="nav-sec">Workflows</div>
+      <button class="nav-parent {{ acqParentCls }}" onClick="{{ toggleAcquire }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+        <span class="nm-name">Acquire</span>
+        <span class="nm-badge live">Live</span>
+        <span class="nav-chev"></span>
+      </button>
+      <sc-if value="{{ openAcquire }}" hint-placeholder-val="{{ true }}">
+      <div class="nav-sub">
+        <a class="nav-item" href="acquire/Acquire.dc.html"><span class="nm-name">{{ workspace }} — round</span></a>
+        <button class="nav-item" onClick="{{ goNewRound }}"><span class="nm-name">+ New round</span></button>
+      </div>
+      </sc-if>
+      <button class="nav-parent {{ closeParentCls }}" onClick="{{ toggleClose }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="6.5" width="10" height="7" rx="1"></rect><path d="M5.2 6.5V5a2.8 2.8 0 0 1 5.6 0v1.5"></path></svg>
+        <span class="nm-name">Close</span>
+        <span class="nm-badge prep">VDD</span>
+        <span class="nav-chev"></span>
+      </button>
+      <sc-if value="{{ openClose }}" hint-placeholder-val="{{ false }}">
+      <div class="nav-sub">
+        <button class="nav-item {{ a.closeDataroom }}" onClick="{{ goCloseDataroom }}"><span class="nm-name">Dataroom</span></button>
+        <button class="nav-item {{ a.closeQA }}" onClick="{{ goCloseQA }}"><span class="nm-name">Q&amp;A / requests</span></button>
+        <button class="nav-item {{ a.closeFindings }}" onClick="{{ goCloseFindings }}"><span class="nm-name">Findings &amp; diligence log</span></button>
+        <button class="nav-item {{ a.closeFinancials }}" onClick="{{ goCloseFinancials }}"><span class="nm-name">Financials &amp; models</span></button>
+        <button class="nav-item {{ a.closeTerms }}" onClick="{{ goCloseTerms }}"><span class="nm-name">Term sheets &amp; legal</span></button>
+        <button class="nav-item {{ a.closeWarehouse }}" onClick="{{ goCloseWarehouse }}"><span class="nm-name">Data warehouse</span></button>
+      </div>
+      </sc-if>
+      <button class="nav-item {{ a.inform }}" onClick="{{ goInform }}">
+        <svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 4.5h11v7h-11z"></path><path d="M2.5 5l5.5 4 5.5-4"></path></svg>
+        <span class="nm-name">Inform investors</span>
+        <span class="nm-badge road">Soon</span>
+      </button>
+
+      <div class="nav-sec">Documents &amp; databases</div>
+      <button class="nav-item {{ a.docsInvestors }}" onClick="{{ goDocsInvestors }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><ellipse cx="8" cy="3.6" rx="5" ry="1.9"></ellipse><path d="M3 3.6v8.8c0 1 2.2 1.9 5 1.9s5-.9 5-1.9V3.6"></path><path d="M3 8c0 1 2.2 1.9 5 1.9s5-.9 5-1.9"></path></svg><span class="nm-name">Investor database</span></button>
+      <button class="nav-item {{ a.docsLibrary }}" onClick="{{ goDocsLibrary }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2H4v12h8V5z"></path><path d="M9 2v3h3"></path></svg><span class="nm-name">Document library</span></button>
+      <button class="nav-item {{ a.docsCompanies }}" onClick="{{ goDocsCompanies }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="2.5" width="7" height="11" rx="1"></rect><path d="M10 6h3v7.5H10"></path><path d="M5 5h3M5 7.5h3M5 10h3"></path></svg><span class="nm-name">Company records</span></button>
+      <button class="nav-item {{ a.docsContacts }}" onClick="{{ goDocsContacts }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="2.3"></circle><path d="M2.5 13c0-2 1.6-3.3 3.5-3.3S9.5 11 9.5 13"></path><circle cx="11.5" cy="5.5" r="1.6"></circle><path d="M10.5 9.4c1.8-.3 3 .9 3 3"></path></svg><span class="nm-name">Contacts &amp; relationships</span></button>
+      <button class="nav-item {{ a.docsCaptable }}" onClick="{{ goDocsCaptable }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="5.5"></circle><path d="M8 2.5V8l4 2.4"></path></svg><span class="nm-name">Cap table &amp; register</span></button>
+      <button class="nav-item {{ a.docsTemplates }}" onClick="{{ goDocsTemplates }}"><svg class="nav-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="11" height="11" rx="1"></rect><path d="M2.5 6h11M6 6v7.5"></path></svg><span class="nm-name">Templates</span></button>
+
+    </nav>
+    <div class="side-foot">
+      <div class="side-client">
+        <div class="side-client-l">Client</div>
+        <div class="side-client-n">{{ workspace }}</div>
+      </div>
+      <button class="side-signout" onClick="{{ exitApp }}">Sign out</button>
+      <div class="prep"><span class="prep-l">Powered by</span><img class="side-logo-foot" src="assets/evolute-wordmark-dark.svg" alt="Evolute"></div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ── Intelligence · Cross-deal dashboard ── -->
+    <sc-if value="{{ showDash }}" hint-placeholder-val="{{ true }}">
+    <div class="view">
+      <p class="view-eyebrow">Intelligence</p>
+      <h1 class="view-h">Cross-deal dashboard</h1>
+      <p class="view-sub">Every live mandate across the desk, in one glance. What's committed, what's next, and where momentum is building.</p>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-l">Live mandates</div><div class="kpi-v">5</div><div class="kpi-m">across 4 clients</div></div>
+        <div class="kpi"><div class="kpi-l">Capital in market</div><div class="kpi-v">€320M</div><div class="kpi-m">mandated &amp; targeted</div></div>
+        <div class="kpi"><div class="kpi-l">Committed / soft-circled</div><div class="kpi-v">€178M</div><div class="kpi-m">56% of target</div></div>
+        <div class="kpi"><div class="kpi-l">Closing this quarter</div><div class="kpi-v">2</div><div class="kpi-m">Atlas refi · Helios</div></div>
+      </div>
+
+      <div class="view-sec-h"><h2>Live mandates</h2><span class="sh-meta">Sorted by next milestone</span></div>
+      <div class="panel">
+        <div class="panel-hd"><h3>Deal pipeline</h3><span class="cnt">5 mandates</span></div>
+        <table class="tbl">
+          <thead><tr><th>Mandate</th><th>Stage</th><th class="num">Target</th><th>Committed</th><th>Next milestone</th><th>Momentum</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-name">Project Helios</div><div class="d-type">Growth round · Evolute</div></td><td><span class="tag diligence">Diligence</span></td><td class="num num-strong">€20M</td><td><div class="cbar-wrap"><span class="cbar"><i style="width:72%"></i></span><span class="cbar-pct">72%</span></div></td><td>Buyer site visit · Jul 9</td><td><span class="mo up"><span class="mo-dot"></span>Building</span></td></tr>
+            <tr><td><div class="d-name">Northwind carve-out</div><div class="d-type">Divestment · Northwind Materials</div></td><td><span class="tag marketing">Marketing</span></td><td class="num num-strong">€120M</td><td><div class="cbar-wrap"><span class="cbar"><i style="width:45%"></i></span><span class="cbar-pct">45%</span></div></td><td>IOIs due · Jul 11</td><td><span class="mo flat"><span class="mo-dot"></span>Steady</span></td></tr>
+            <tr><td><div class="d-name">Meridian Series B</div><div class="d-type">Equity raise · Meridian Bio</div></td><td><span class="tag origination">Origination</span></td><td class="num num-strong">€35M</td><td><div class="cbar-wrap"><span class="cbar"><i style="width:28%"></i></span><span class="cbar-pct">28%</span></div></td><td>Anchor term sheet · Jul 14</td><td><span class="mo up"><span class="mo-dot"></span>Building</span></td></tr>
+            <tr><td><div class="d-name">Atlas refinancing</div><div class="d-type">Debt refi · Atlas Logistics</div></td><td><span class="tag closing">Closing</span></td><td class="num num-strong">€80M</td><td><div class="cbar-wrap"><span class="cbar"><i style="width:94%"></i></span><span class="cbar-pct">94%</span></div></td><td>Signing · Jul 8</td><td><span class="mo up"><span class="mo-dot"></span>Building</span></td></tr>
+            <tr><td><div class="d-name">Coastal Group sale</div><div class="d-type">Company sale · Coastal Group</div></td><td><span class="tag origination">Origination</span></td><td class="num num-strong">€65M</td><td><div class="cbar-wrap"><span class="cbar"><i style="width:12%"></i></span><span class="cbar-pct">12%</span></div></td><td>Teaser approval · Jul 10</td><td><span class="mo down"><span class="mo-dot"></span>Cooling</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ── Intelligence · Market intelligence ── -->
+    <sc-if value="{{ showMarket }}" hint-placeholder-val="{{ false }}">
+    <div class="view">
+      <p class="view-eyebrow">Intelligence</p>
+      <h1 class="view-h">Market intelligence</h1>
+      <p class="view-sub">Sector multiples and the transactions that set them — the comparables desk teams reach for when they price a round.</p>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-hd"><h3>Sector comparables</h3><span class="cnt">Trailing 12 months</span></div>
+          <table class="tbl">
+            <thead><tr><th>Sector</th><th class="num">EV / EBITDA</th><th class="num">EV / Rev</th><th class="num">Deals</th><th class="num">YoY</th></tr></thead>
+            <tbody>
+              <tr><td class="d-name">Renewables</td><td class="num num-strong">10.4×</td><td class="num num-mut">4.2×</td><td class="num num-mut">41</td><td class="num"><span class="trend pos">+19%</span></td></tr>
+              <tr><td class="d-name">Healthcare services</td><td class="num num-strong">13.6×</td><td class="num num-mut">3.1×</td><td class="num num-mut">29</td><td class="num"><span class="trend pos">+12%</span></td></tr>
+              <tr><td class="d-name">Industrial tech</td><td class="num num-strong">11.2×</td><td class="num num-mut">2.4×</td><td class="num num-mut">34</td><td class="num"><span class="trend pos">+8%</span></td></tr>
+              <tr><td class="d-name">Business services</td><td class="num num-strong">9.7×</td><td class="num num-mut">2.0×</td><td class="num num-mut">26</td><td class="num"><span class="trend flat">+2%</span></td></tr>
+              <tr><td class="d-name">Materials</td><td class="num num-strong">8.1×</td><td class="num num-mut">1.6×</td><td class="num num-mut">21</td><td class="num"><span class="trend neg">−3%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-hd"><h3>Recent transactions</h3><span class="cnt">Last 60 days</span></div>
+          <div class="txn">
+            <div class="txn-row"><div class="txn-t">Terra Renewables → <b>Brookfield</b></div><div class="txn-m"><span>Renewables</span><span>·</span><span>Majority stake</span><span>·</span><span>May 2026</span></div><div class="txn-val" style="margin-top:8px">€340M</div></div>
+            <div class="txn-row"><div class="txn-t">Vantage Fluidics → <b>Kohlberg</b></div><div class="txn-m"><span>Industrial tech</span><span>·</span><span>Buyout</span><span>·</span><span>Jun 2026</span></div><div class="txn-val" style="margin-top:8px">€210M</div></div>
+            <div class="txn-row"><div class="txn-t">Northbridge Coatings → <b>PPG</b></div><div class="txn-m"><span>Materials</span><span>·</span><span>Trade sale</span><span>·</span><span>May 2026</span></div><div class="txn-val" style="margin-top:8px">€95M</div></div>
+            <div class="txn-row"><div class="txn-t">Meridian Bio → <b>Atomico (lead)</b></div><div class="txn-m"><span>Healthcare</span><span>·</span><span>Series B</span><span>·</span><span>Jun 2026</span></div><div class="txn-val" style="margin-top:8px">€35M</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ── Intelligence · Alerts & signals ── -->
+    <sc-if value="{{ showAlerts }}" hint-placeholder-val="{{ false }}">
+    <div class="view">
+      <p class="view-eyebrow">Intelligence</p>
+      <h1 class="view-h">Alerts &amp; signals</h1>
+      <p class="view-sub">Movements, deadlines and market news across every mandate — the feed that tells the desk what changed while they slept.</p>
+
+      <div class="feed">
+        <div class="feed-day">Today · Mon 6 Jul</div>
+        <div class="alert"><div class="al-time">08:12</div><div class="al-body"><span class="al-tag deadline">Deadline</span><div class="al-txt">IOIs for the Northwind carve-out are due today, 17:00 CET.</div><div class="al-rel">Mandate · <b>Northwind carve-out</b></div></div></div>
+        <div class="alert"><div class="al-time">09:40</div><div class="al-body"><span class="al-tag movement">Movement</span><div class="al-txt">Anchor investor moved Meridian Series B from <i>Considering</i> to <i>Committed</i> — €10M soft-circled.</div><div class="al-rel">Mandate · <b>Meridian Series B</b></div></div></div>
+        <div class="alert"><div class="al-time">11:05</div><div class="al-body"><span class="al-tag market">Market</span><div class="al-txt">Brookfield closed Terra Renewables at 10.4× EBITDA — a fresh comp for the Helios round.</div><div class="al-rel">Signal · <b>Renewables sector</b></div></div></div>
+
+        <div class="feed-day">Earlier this week</div>
+        <div class="alert"><div class="al-time">Tue</div><div class="al-body"><span class="al-tag document">Document</span><div class="al-txt">The buyer opened the Financials folder 14 times in the Helios dataroom — heaviest activity since diligence began.</div><div class="al-rel">Mandate · <b>Project Helios</b></div></div></div>
+        <div class="alert"><div class="al-time">Tue</div><div class="al-body"><span class="al-tag deadline">Deadline</span><div class="al-txt">Atlas refinancing signing scheduled Jul 8, 14:00 — final conditions cleared.</div><div class="al-rel">Mandate · <b>Atlas refinancing</b></div></div></div>
+        <div class="alert"><div class="al-time">Wed</div><div class="al-body"><span class="al-tag movement">Movement</span><div class="al-txt">Two Coastal Group targets declined the teaser — funnel refreshed with three replacements.</div><div class="al-rel">Mandate · <b>Coastal Group sale</b></div></div></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ── Placeholder pane for Workflows / Documents sections ── -->
+    <sc-if value="{{ showPlaceholder }}" hint-placeholder-val="{{ false }}">
+    <div class="ph">
+      <p class="view-eyebrow">{{ ph.eyebrow }}</p>
+      <h1 class="view-h">{{ ph.title }}</h1>
+      <p class="ph-desc">{{ ph.desc }}</p>
+      <sc-if value="{{ ph.hasList }}" hint-placeholder-val="{{ false }}">
+      <ul class="ph-list">
+        <sc-for list="{{ ph.items }}" as="it" hint-placeholder-count="3"><li>{{ it }}</li></sc-for>
+      </ul>
+      </sc-if>
+      <div class="ph-actions">
+        <sc-if value="{{ ph.hasLink }}" hint-placeholder-val="{{ false }}"><a class="ph-link" href="{{ ph.href }}">{{ ph.linkLabel }}</a></sc-if>
+        <span class="ph-chip {{ ph.chipCls }}">{{ ph.chip }}</span>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  CONFIG = { workspace: "Northwind Materials" };
+  state = {
+    entered: (() => { try { return sessionStorage.getItem("q_shell_entered") === "1"; } catch (e) { return false; } })(),
+    view: "intelDashboard",
+    openAcquire: true,
+    openClose: false,
+  };
+
+  PH = {
+    inform: { eyebrow: "Workflows", title: "Inform investors", desc: "Keep shareholders warm between rounds so the next raise starts halfway done. Structured updates, board packs and AGM prep, all drawing on the same investor database as Acquire.", items: ["Quarterly investor updates, house style", "AGM & board pack assembly", "Distribution to the syndicate register"], chip: "Roadmap", chipCls: "road" },
+    closeDataroom: { eyebrow: "Workflows · Close (VDD)", title: "Dataroom", desc: "Indexed, permissioned documents — every file the buyer sees, tracked to the click. Runs on the Q VDD workspace.", items: ["Structured folder index with access control", "Per-file view & download tracking", "Watermarking and expiry on sensitive items"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    closeQA: { eyebrow: "Workflows · Close (VDD)", title: "Q&A / buyer requests", desc: "Structured buyer questions routed to the right owner, answered once, and reused across bidders — no duplicated effort, full audit trail.", items: ["Threaded requests by workstream", "Owner assignment & SLA tracking", "Answer library reused across bidders"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    closeFindings: { eyebrow: "Workflows · Close (VDD)", title: "Findings & diligence log", desc: "Every issue raised in diligence, its severity, its status, and who owns the fix — so nothing surfaces at signing that wasn't already known.", items: ["Findings register by severity", "Remediation owner & status", "Link-through to the source document"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    closeFinancials: { eyebrow: "Workflows · Close (VDD)", title: "Financials & models", desc: "The single source model — historicals, projections, and the bridge between them — versioned so the buyer and the vendor argue from the same numbers.", items: ["Locked historicals & audited actuals", "Management projections with assumptions", "Version history and change log"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    closeTerms: { eyebrow: "Workflows · Close (VDD)", title: "Term sheets & legal", desc: "From first draft to signature — versions, redlines and the point of no return, with the legal workstream sitting beside the dataroom it draws on.", items: ["Term sheet versions & redlines", "SPA / SHA drafting workspace", "Signature & conditions checklist"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    closeWarehouse: { eyebrow: "Workflows · Close (VDD)", title: "Data warehouse", desc: "Live operational feeds — the numbers behind the numbers, updated continuously so diligence works off current data instead of a stale snapshot.", items: ["Live operational & commercial feeds", "KPI reconciliation to the model", "Continuous refresh, no stale snapshots"], chip: "VDD workspace", chipCls: "prep", link: "close/Close.dc.html", linkLabel: "Open Close (VDD)" },
+    docsInvestors: { eyebrow: "Documents & databases", title: "Investor & counterparty database", desc: "Every investor and counterparty the desk has ever touched — one record per firm, shared across every mandate. The list Acquire builds a funnel from and Inform sends updates to.", items: ["Firm & fund records with mandates", "Contact history across all deals", "Segmentation for outreach & targeting"], chip: "Shared", chipCls: "live" },
+    docsLibrary: { eyebrow: "Documents & databases", title: "Document library", desc: "All files, versioned and searchable, reusable across every mandate. The library the dataroom, decks and templates all pull from.", items: ["Central versioned file store", "Full-text search across mandates", "Reuse into datarooms & decks"], chip: "Shared", chipCls: "live" },
+    docsCompanies: { eyebrow: "Documents & databases", title: "Company & entity records", desc: "Legal entities, ownership structure, and the paper that proves it — the corporate record every workflow references.", items: ["Entity tree & jurisdictions", "Directors, signatories & filings", "Links to the cap table of record"], chip: "Shared", chipCls: "live" },
+    docsContacts: { eyebrow: "Documents & databases", title: "Contacts & relationships", desc: "Who knows whom — the relationship graph behind every warm introduction, mapped across the whole desk.", items: ["People records linked to firms", "Relationship strength & owner", "Introduction paths to any target"], chip: "Shared", chipCls: "live" },
+    docsCaptable: { eyebrow: "Documents & databases", title: "Cap table & shareholder register", desc: "Ownership today, and after the round — the register of record that Acquire dilutes into and Inform reports from.", items: ["Fully-diluted ownership by class", "Round modelling & waterfall", "Register of record for the entity"], chip: "Shared", chipCls: "live" },
+    docsTemplates: { eyebrow: "Documents & databases", title: "Templates", desc: "Decks, term sheets and investor updates in house style, ready to fork — so every workflow starts from the same polished baseline.", items: ["Pitch & teaser deck templates", "Term sheet & NDA boilerplate", "Investor update & board pack formats"], chip: "Shared", chipCls: "live" },
+  };
+
+  set(view) { this.setState({ view }); }
+
+  renderVals() {
+    const V = this.state.view;
+    const on = (k) => (V === k ? "on" : "");
+    const a = {
+      dash: on("intelDashboard"), market: on("intelMarket"), alerts: on("intelAlerts"),
+      inform: on("inform"),
+      closeDataroom: on("closeDataroom"), closeQA: on("closeQA"), closeFindings: on("closeFindings"),
+      closeFinancials: on("closeFinancials"), closeTerms: on("closeTerms"), closeWarehouse: on("closeWarehouse"),
+      docsInvestors: on("docsInvestors"), docsLibrary: on("docsLibrary"), docsCompanies: on("docsCompanies"),
+      docsContacts: on("docsContacts"), docsCaptable: on("docsCaptable"), docsTemplates: on("docsTemplates"),
+    };
+    const closeViews = ["closeDataroom", "closeQA", "closeFindings", "closeFinancials", "closeTerms", "closeWarehouse"];
+    const raw = this.PH[V] || null;
+    const ph = raw ? {
+      eyebrow: raw.eyebrow, title: raw.title, desc: raw.desc,
+      hasList: !!(raw.items && raw.items.length), items: raw.items || [],
+      hasLink: !!raw.link, href: raw.link || "#", linkLabel: raw.linkLabel || "Open",
+      chip: raw.chip, chipCls: raw.chipCls,
+    } : { eyebrow: "", title: "", desc: "", hasList: false, items: [], hasLink: false, href: "#", linkLabel: "", chip: "", chipCls: "" };
+
+    return {
+      onLanding: !this.state.entered,
+      showApp: !!this.state.entered,
+      workspace: this.CONFIG.workspace,
+      enterApp: () => { try { sessionStorage.setItem("q_shell_entered", "1"); } catch (e) {} this.setState({ entered: true }); },
+      exitApp: () => { try { sessionStorage.setItem("q_shell_entered", "0"); } catch (e) {} this.setState({ entered: false }); },
+
+      showDash: V === "intelDashboard",
+      showMarket: V === "intelMarket",
+      showAlerts: V === "intelAlerts",
+      showPlaceholder: !!raw,
+      ph,
+
+      a,
+      openAcquire: this.state.openAcquire,
+      openClose: this.state.openClose,
+      acqParentCls: this.state.openAcquire ? "open" : "",
+      closeParentCls: (this.state.openClose ? "open " : "") + (closeViews.includes(V) ? "active" : ""),
+
+      toggleAcquire: () => this.setState((s) => ({ openAcquire: !s.openAcquire })),
+      toggleClose: () => this.setState((s) => ({ openClose: !s.openClose })),
+
+      goDash: () => this.set("intelDashboard"),
+      goMarket: () => this.set("intelMarket"),
+      goAlerts: () => this.set("intelAlerts"),
+      goInform: () => this.set("inform"),
+      goNewRound: () => this.set("inform"),
+      goCloseDataroom: () => this.set("closeDataroom"),
+      goCloseQA: () => this.set("closeQA"),
+      goCloseFindings: () => this.set("closeFindings"),
+      goCloseFinancials: () => this.set("closeFinancials"),
+      goCloseTerms: () => this.set("closeTerms"),
+      goCloseWarehouse: () => this.set("closeWarehouse"),
+      goDocsInvestors: () => this.set("docsInvestors"),
+      goDocsLibrary: () => this.set("docsLibrary"),
+      goDocsCompanies: () => this.set("docsCompanies"),
+      goDocsContacts: () => this.set("docsContacts"),
+      goDocsCaptable: () => this.set("docsCaptable"),
+      goDocsTemplates: () => this.set("docsTemplates"),
+    };
+  }
+}
+</script>
+</body>
+</html>

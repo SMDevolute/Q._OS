@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FBFAF8; color: #192432; font-family: "Inter", system-ui, sans-serif; font-weight: 300; }
+  button, a { font-family: inherit; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 252px; flex: none; background: #f4f3ef; border-right: 1px solid #e6e3dc; padding: 26px 18px 20px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+  .side-brand { font-family: "Space Grotesk", sans-serif; font-size: 38px; font-weight: 400; line-height: 0.9; color: #121923; padding-left: 4px; display: flex; align-items: flex-end; }
+  .q-dot { width: 7px; height: 7px; border-radius: 50%; background: #121923; margin: 0 0 3px 4px; }
+  .q-word { font-family: "Inter", sans-serif; font-size: 9px; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: #989CA3; white-space: nowrap; padding-left: 5px; margin-top: 9px; }
+  .side-ws { margin-top: 20px; padding: 10px 12px 11px; background: #efede7; border-radius: 9px; }
+  .side-ws-l { font-family: "Inter", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #aeb4bd; margin-bottom: 3px; }
+  .side-project { font-family: "Inter", sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #121923; }
+  .side-nav { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-back { text-decoration: none; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 600; color: #6b7480; padding: 8px 12px; border-radius: 7px; display: block; margin-bottom: 6px; }
+  .nav-back:hover { background: #eceae4; color: #192432; }
+  .nav-module-lbl { font-family: "Inter", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #C8C3B5; padding: 6px 12px 6px; }
+  .nav-item { text-align: left; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 400; color: #41495a; background: transparent; border: none; border-radius: 7px; padding: 7px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .nav-item:hover { background: #eceae4; }
+  .nav-item.active { background: #fff; color: #192432; font-weight: 600; box-shadow: 0 1px 2px rgba(25,36,50,0.05); }
+  .nav-item .nm-badge { margin-left: auto; font-size: 8.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; color: #8a8f97; background: #EDEBE4; }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; padding-top: 20px; }
+  .prep { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+  .prep-l { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #989CA3; line-height: 1; }
+  .side-logo-foot { height: 13px; width: auto; display: block; opacity: 0.75; }
+
+  .content { flex: 1 1 auto; min-width: 0; height: 100vh; overflow: auto; }
+  .screen { display: none; padding: 56px clamp(28px, 4.5vw, 72px) 104px; max-width: 1080px; }
+  .screen.active { display: block; }
+  .eyebrow { font-family: "Inter", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #121923; margin: 0 0 17px; }
+  h1.title { font-family: "Space Grotesk", sans-serif; font-weight: 400; font-size: 32px; line-height: 1.04; margin: 0 0 14px; letter-spacing: -0.025em; color: #121923; }
+  .sec-rule { height: 1px; background: #eceae4; margin: 10px 0 28px; }
+  .lead-p { font-size: 15px; line-height: 1.65; color: #3a4250; margin: 0 0 28px; max-width: 64ch; }
+  .lead-p b { color: #192432; }
+
+  .ws-grid { display: flex; flex-direction: column; gap: 16px; max-width: 760px; }
+  .ws-card { background: #fff; border: 1px solid #e6e3dc; border-radius: 14px; padding: 24px 28px; }
+  .ws-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+  .ws-name { font-family: "Space Grotesk", sans-serif; font-weight: 400; font-size: 24px; letter-spacing: -0.02em; color: #121923; }
+  .ws-badge { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; color: #6b7480; background: #EDEBE4; white-space: nowrap; }
+  .ws-desc { font-size: 15px; line-height: 1.55; color: #3a4250; margin: 0; }
+  .ws-open { background: none; border: none; padding: 0; margin-top: 14px; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 600; color: #2B5C87; cursor: pointer; }
+  .ws-open:hover { text-decoration: underline; }
+
+  .prep-note { display: flex; gap: 14px; align-items: flex-start; background: #F4F8FC; border: 1px solid #dfe7ee; border-radius: 12px; padding: 20px 22px; max-width: 700px; }
+  .prep-q { font-family: "Space Grotesk", sans-serif; font-size: 26px; font-weight: 400; color: #B3CBE0; line-height: 1; }
+  .prep-body { font-size: 14px; line-height: 1.6; color: #41495a; }
+  .prep-body b { color: #1E466B; }
+  @media (max-width: 860px) {
+    .app { flex-direction: column; }
+    .sidebar { width: auto; height: auto; position: static; border-right: none; border-bottom: 1px solid #e6e3dc; }
+    .content { height: auto; overflow: visible; }
+    .screen { padding: 36px 20px 72px; max-width: none; }
+  }
+</style>
+</helmet>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-brand">Q<span class="q-dot"></span></div>
+    <div class="q-word">Capital Operating Model</div>
+    <div class="side-ws">
+      <div class="side-ws-l">Workspace</div>
+      <div class="side-project">{{ workspace }}</div>
+    </div>
+    <nav class="side-nav">
+      <a class="nav-back" href="../Q.%20Operating%20System.dc.html">← Q. OS</a>
+      <div class="nav-module-lbl">Close</div>
+      <sc-for list="{{ nav }}" as="it" hint-placeholder-count="4">
+        <button class="nav-item {{ it.cls }}" onClick="{{ it.onClick }}"><span>{{ it.label }}</span><sc-if value="{{ it.soon }}" hint-placeholder-val="{{ true }}"><span class="nm-badge">Prep</span></sc-if></button>
+      </sc-for>
+    </nav>
+    <div class="side-foot">
+      <div class="prep"><span class="prep-l">Powered by</span><img class="side-logo-foot" src="assets/evolute-wordmark-dark.svg" alt="Evolute"></div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <section class="screen {{ secOverview }}" data-screen-label="Close Overview">
+      <p class="eyebrow">Close · Module</p>
+      <h1 class="title">From intent to signature.</h1>
+      <div class="sec-rule"></div>
+      <p class="lead-p">Once an investor is in, <b>Close</b> takes over: keep the dataroom diligence-ready, answer every question in one place, track findings to resolution, and drive term sheets to signature. Nothing left for the buyer to find first.</p>
+      <div class="ws-grid">
+        <div class="ws-card">
+          <div class="ws-top"><span class="ws-name">Dataroom &amp; Q&amp;A</span><span class="ws-badge">In prep</span></div>
+          <p class="ws-desc">A single, permissioned source of truth. Every investor question logged, routed and answered once.</p>
+          <button class="ws-open" onClick="{{ goDataroom }}">Open workstream →</button>
+        </div>
+        <div class="ws-card">
+          <div class="ws-top"><span class="ws-name">Findings</span><span class="ws-badge">In prep</span></div>
+          <p class="ws-desc">Diligence findings tracked to resolution, with owner and status, so nothing surprises you at signing.</p>
+          <button class="ws-open" onClick="{{ goFindings }}">Open workstream →</button>
+        </div>
+        <div class="ws-card">
+          <div class="ws-top"><span class="ws-name">Term sheets</span><span class="ws-badge">In prep</span></div>
+          <p class="ws-desc">From first draft to executed term sheet: versions, redlines and the path to signature.</p>
+          <button class="ws-open" onClick="{{ goTerms }}">Open workstream →</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen {{ secDataroom }}" data-screen-label="Dataroom & Q&A">
+      <p class="eyebrow">Close · Dataroom &amp; Q&amp;A</p>
+      <h1 class="title">Dataroom &amp; Q&amp;A</h1>
+      <div class="sec-rule"></div>
+      <div class="prep-note"><span class="prep-q">Q.</span><div class="prep-body">This workstream is <b>in prep</b>. Next: a permissioned document tree, per-investor access, and a Q&amp;A log where every question is answered once and reused.</div></div>
+    </section>
+
+    <section class="screen {{ secFindings }}" data-screen-label="Findings">
+      <p class="eyebrow">Close · Findings</p>
+      <h1 class="title">Findings</h1>
+      <div class="sec-rule"></div>
+      <div class="prep-note"><span class="prep-q">Q.</span><div class="prep-body">This workstream is <b>in prep</b>. Next: a findings register — issue, owner, severity, status — driving each to resolution before signing.</div></div>
+    </section>
+
+    <section class="screen {{ secTerms }}" data-screen-label="Term sheets">
+      <p class="eyebrow">Close · Term sheets</p>
+      <h1 class="title">Term sheets</h1>
+      <div class="sec-rule"></div>
+      <div class="prep-note"><span class="prep-q">Q.</span><div class="prep-body">This workstream is <b>in prep</b>. Next: term-sheet drafting and versioning against the mandate set in Acquire, with the path to signature.</div></div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  CONFIG = { workspace: "Northwind Materials" };
+  state = { sec: 0 };
+  renderVals() {
+    const sec = this.state.sec;
+    const items = ["Overview", "Dataroom & Q&A", "Findings", "Term sheets"];
+    return {
+      workspace: this.CONFIG.workspace,
+      nav: items.map((label, i) => ({
+        label, cls: sec === i ? "active" : "", soon: i !== 0,
+        onClick: () => this.setState({ sec: i }),
+      })),
+      secOverview: sec === 0 ? "active" : "",
+      secDataroom: sec === 1 ? "active" : "",
+      secFindings: sec === 2 ? "active" : "",
+      secTerms: sec === 3 ? "active" : "",
+      goDataroom: () => this.setState({ sec: 1 }),
+      goFindings: () => this.setState({ sec: 2 }),
+      goTerms: () => this.setState({ sec: 3 }),
+    };
+  }
+}
+</script>
+</body>
+</html>
