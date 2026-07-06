@@ -1,9 +1,0 @@
-# Q. OS — single Cloudflare Worker (Workers Static Assets).
-# Serves the static app now; API routes get added under /api/ later (see docs/BACKEND_AND_SYNC.md).
-name = "q-os"
-main = "src/worker.js"
-compatibility_date = "2025-01-01"
-
-[assets]
-directory = "./"        # static app: index.html, *.dc.html, support.js, assets/, acquire/, close/, retain/
-binding = "ASSETS"

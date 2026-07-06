@@ -18,17 +18,19 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "q-os"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"   # from: wrangler d1 create q-os
+database_id = "e418c540-449d-498f-8337-fb763bbd7c46"   # from: wrangler d1 create q-os
 
-# R2 — files + large email bodies
-[[r2_buckets]]
-binding = "FILES"
-bucket_name = "q-os-files"                     # from: wrangler r2 bucket create q-os-files
+# R2 — files + large email bodies (Phase 2). Not used by Phase 1 code (no env.FILES),
+# and R2 must be enabled once in the Cloudflare dashboard before `r2 bucket create q-os-files`
+# will work. Re-enable this binding when the file features land.
+# [[r2_buckets]]
+# binding = "FILES"
+# bucket_name = "q-os-files"
 
 # KV — short-lived counters (login rate limiting)
 [[kv_namespaces]]
 binding = "RATE"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"            # from: wrangler kv namespace create RATE
+id = "2b051f60a324431da5b4b06eb96ac749"            # from: wrangler kv namespace create RATE
 
 # ── Secrets (set with `wrangler secret put NAME`, NEVER commit) ──
 #   SESSION_PEPPER    long random string mixed into every password hash
