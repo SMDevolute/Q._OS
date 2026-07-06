@@ -11,8 +11,9 @@ data persists across sessions/devices, and there's a public/team URL. One **Clou
 a store, owned by us.
 
 ## Proposed design (build fresh)
-- **Worker** (`workers/q-os-sync/`) exposing a small JSON API: `GET /state?room=…`,
-  `POST /flush` (batched record upserts + tombstones), and a realtime channel (SSE or WebSocket).
+- **Same Worker that serves the app** (add API routes under `/api/` in `src/worker.js`; see
+  `DEPLOYMENT.md`) exposing a small JSON API: `GET /api/state?room=…`,
+  `POST /api/flush` (batched record upserts + tombstones), and a realtime channel (SSE or WebSocket).
 - **Store:** a **Durable Object** per workspace ("room") is the clean fit for live collaboration;
   **KV** or **D1** is fine for a simpler last-write-wins first version. Start simple (KV/D1), move to
   a Durable Object when you want true realtime.
@@ -24,8 +25,9 @@ a store, owned by us.
 ## Client wiring
 - The app expects a sync layer keyed off `CONFIG.syncUrl` + `CONFIG.syncRoom` (both in the
   `Component` class in `acquire/Acquire.dc.html`). When `syncUrl` is empty, it stays local.
-- To go live: deploy the Worker, then set `CONFIG.syncUrl` to the Worker URL and `CONFIG.syncRoom`
-  to the workspace room. Data still mirrors to `localStorage` as an offline cache.
+- To go live: add the `/api/` routes to the app Worker, then set `CONFIG.syncUrl` to `"/api"`
+  (same origin as the app) and `CONFIG.syncRoom` to the workspace room. Data still mirrors to
+  `localStorage` as an offline cache.
 
 ## Secrets & config (NEVER commit)
 Create these in **Cloudflare** (Wrangler secrets or the dashboard), not in the repo:
@@ -34,8 +36,8 @@ Create these in **Cloudflare** (Wrangler secrets or the dashboard), not in the r
 - `wrangler.toml` holds the Worker name, routes, and DO/KV/D1 bindings (safe to commit — no secrets).
 
 ## Sequence to stand it up
-1. `wrangler init q-os-sync` in `workers/q-os-sync/`.
-2. Implement the API + store (start KV/D1, LWW).
-3. `wrangler secret put EDIT_CODE` / `VIEW_CODE`; add bindings in `wrangler.toml`.
-4. `wrangler deploy` → note the Worker URL.
-5. Set `CONFIG.syncUrl` in `acquire/Acquire.dc.html`, push → Pages redeploys → multiplayer live.
+1. In the app Worker (`src/worker.js`), route `/api/*` to a handler; serve assets otherwise.
+2. Implement the API + store (start KV/D1, last-write-wins).
+3. `wrangler secret put EDIT_CODE` / `VIEW_CODE`; add the store binding in `wrangler.toml`.
+4. Push → Workers Builds redeploys (or `wrangler deploy`).
+5. Set `CONFIG.syncUrl = "/api"` in `acquire/Acquire.dc.html`, push → redeploys → multiplayer live.

@@ -87,17 +87,19 @@ purpose. The plan is a fresh Cloudflare Worker + storage, owned by us.
 
 Full design, the Cloudflare setup, and the exact secrets to create are in
 **`docs/BACKEND_AND_SYNC.md`**. Short version: build a Worker with a KV/D1/Durable-Object store
-for shared workspace data + view/edit access codes, then set Acquire's `CONFIG.syncUrl` to the
-Worker URL. Secrets live in Cloudflare (Wrangler secrets / dashboard) — **never commit them.**
+for shared workspace data + view/edit access codes, then point Acquire's `CONFIG.syncUrl` at the
+same Worker (same-origin `/api`). Secrets live in Cloudflare (Wrangler secrets / dashboard) — **never commit them.**
 
 ---
 
 ## 6. Deployment
 
-Static site → **Cloudflare Pages**. Step-by-step in **`docs/DEPLOYMENT.md`**.
-- Framework preset: **None**, build command: **empty**, output dir: **`/`**.
+A **single Cloudflare Worker** (Workers Static Assets) serves the app now and will host the sync API
+later — one project, one deploy, no CORS. Step-by-step in **`docs/DEPLOYMENT.md`**.
+- `wrangler.toml` with an `[assets]` binding serving the repo; `src/worker.js` passes through to
+  static assets (API routes get added under `/api/` later).
+- Connect the repo via **Workers Builds** → auto-deploys on every push to `main`.
 - Entry: `index.html` redirects to `Q.%20Operating%20System.dc.html`.
-- Auto-deploys on every push to `main`.
 
 ---
 
