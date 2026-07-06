@@ -1,0 +1,40 @@
+#:schema node_modules/wrangler/config-schema.json
+# Q. OS — single Worker: serves the static app AND the /api backend.
+
+name = "q-os"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Static app (index.html, *.dc.html, support.js, assets/, acquire/, close/, retain/)
+# lives at the repo root. Everything not under /api is served from here.
+[assets]
+directory = "../"
+binding = "ASSETS"
+# Don't let the backend source or docs be served as public assets:
+# (put an .assetsignore at repo root listing: q-os-deploy/ )
+
+# D1 — structured/relational data
+[[d1_databases]]
+binding = "DB"
+database_name = "q-os"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"   # from: wrangler d1 create q-os
+
+# R2 — files + large email bodies
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "q-os-files"                     # from: wrangler r2 bucket create q-os-files
+
+# KV — short-lived counters (login rate limiting)
+[[kv_namespaces]]
+binding = "RATE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"            # from: wrangler kv namespace create RATE
+
+# ── Secrets (set with `wrangler secret put NAME`, NEVER commit) ──
+#   SESSION_PEPPER    long random string mixed into every password hash
+#   RESEND_API_KEY    (optional) email provider key for magic links / invites
+#   APP_ORIGIN        e.g. https://q-os.rob-803.workers.dev  (CSRF origin allow-list)
+#   MAIL_FROM         e.g. "Q. OS <no-reply@yourdomain>"
+[vars]
+# Non-secret defaults (safe to commit). Override per-environment as needed.
+APP_ORIGIN = "https://q-os.rob-803.workers.dev"

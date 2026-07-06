@@ -1,10 +1,21 @@
-# Files under the assets directory (repo root) that should NOT be served as static assets.
-# The app files (index.html, *.dc.html, support.js, assets/, acquire/, close/, retain/, docs/) are served.
+# Files under the assets directory that must NOT be served as public static assets.
+# Served: index.html, *.dc.html, support.js, assets/, acquire/, close/, retain/.
+
+# repo / build infra
 .git
 .github
 .wrangler
 node_modules
-src
-wrangler.toml
 .assetsignore
 .gitignore
+
+# worker source & config (both the root passthrough and the backend worker)
+src
+wrangler.toml
+backend/
+
+# internal docs & data — not for public serving
+docs/
+*.md
+CLAUDE.md
+*.sql
