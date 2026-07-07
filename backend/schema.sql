@@ -97,6 +97,7 @@ CREATE TABLE rounds (
   open_date     INTEGER,
   target_close  INTEGER,
   is_active     INTEGER NOT NULL DEFAULT 1,     -- the round currently shown by default
+  data          TEXT,                            -- JSON: rich round fields not in structured columns (Acquire mirror)
   created_at    INTEGER NOT NULL,
   deleted_at    INTEGER
 );
@@ -152,6 +153,7 @@ CREATE TABLE deals (
   sort_order     INTEGER NOT NULL DEFAULT 0,   -- position within the stage column
   next_step      TEXT,
   next_step_due  INTEGER,
+  data           TEXT,                            -- JSON: rich card fields not in structured columns (Acquire mirror)
   created_at     INTEGER NOT NULL,
   updated_at     INTEGER NOT NULL,
   deleted_at     INTEGER,

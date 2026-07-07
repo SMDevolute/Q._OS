@@ -2535,6 +2535,7 @@ class Component extends DCLogic {
       this.save(investors); return { investors };
     });
     this.markDirty(id);
+    this.markApiDirty(id);
   }
   // stage change with history logging (kanban + table + panel all route through here)
   setStage(id, value) {
@@ -2548,6 +2549,7 @@ class Component extends DCLogic {
       this.save(investors); return { investors };
     });
     this.markDirty(id);
+    this.markApiDirty(id);
   }
   add() {
     if (this.isReadOnly()) return;
@@ -2555,7 +2557,7 @@ class Component extends DCLogic {
       const row = { id: "inv" + Date.now(), name: "", sub: "", stage: "Not set", owner: "Not set",
         nextContact: "Not set", context: "", leadCandidate: false, continue: "Not set", role: "Not set", ticket: "", notes: "", confidence: "Not set", checks: {}, fields: {} };
       const investors = [...s.investors, row];
-      this.save(investors); this.markDirty(row.id); return { investors, activeSheetId: row.id };
+      this.save(investors); this.markDirty(row.id); this.markApiDirty(row.id); return { investors, activeSheetId: row.id };
     });
   }
   remove(id) {
@@ -2564,6 +2566,7 @@ class Component extends DCLogic {
     const name = (row && row.name && row.name.trim()) ? row.name.trim() : "this investor";
     if (typeof confirm === "function" && !confirm("Remove " + name + " from the pipeline?\n\nThis deletes only this one row (their call sheet and entries). All other investors stay. This cannot be undone.")) return;
     this.markDelete(id);
+    this.markApiDirty(id);
     this.setState(s => {
       const investors = s.investors.filter(r => r.id !== id);
       this.save(investors);
@@ -2597,6 +2600,7 @@ class Component extends DCLogic {
 
   toggleCheck(id, key) {
     this.markDirty(id);
+    this.markApiDirty(id);
     this.setState(s => {
       const investors = s.investors.map(r => {
         if (r.id !== id) return r;
@@ -2611,6 +2615,7 @@ class Component extends DCLogic {
   setField(id, key, value) {
     if (this.isReadOnly()) return;
     this.markDirty(id);
+    this.markApiDirty(id);
     this.setState(s => {
       const investors = s.investors.map(r => r.id === id ? { ...r, fields: { ...(r.fields || {}), [key]: value } } : r);
       this.save(investors); return { investors };
@@ -2621,6 +2626,7 @@ class Component extends DCLogic {
   setRound(key, value) {
     if (this.isReadOnly()) return;
     this.markRoundDirty();
+    this.markRoundApiDirty();
     this.setState(s => { const round = { ...(s.round || {}), [key]: value }; this.saveRound(round); return { round }; });
   }
 
@@ -2638,6 +2644,7 @@ class Component extends DCLogic {
 
   setFieldR(id, key, value) {
     this.markDirty(id);
+    this.markApiDirty(id);
     this.setState(s => {
       const investors = s.investors.map(r => r.id === id ? { ...r, fields: { ...(r.fields || {}), [key]: value } } : r);
       this.save(investors); return { investors };
@@ -2645,6 +2652,7 @@ class Component extends DCLogic {
   }
   setRoundR(key, value) {
     this.markRoundDirty();
+    this.markRoundApiDirty();
     this.setState(s => { const round = { ...(s.round || {}), [key]: value }; this.saveRound(round); return { round }; });
   }
   parseDate(s) {
@@ -2689,11 +2697,16 @@ class Component extends DCLogic {
         this.apiFetch(base + "/deals"), this.apiFetch(base + "/firms"), this.apiFetch(base + "/rounds"),
       ]);
       const deals = dealsR.deals || [];
-      if (!deals.length) { this.setState({ cloudStatus: "online" }); return; }  // empty workspace → keep local view
+      const rr = (roundsR.rounds || []).find(r => r.is_active) || (roundsR.rounds || [])[0];
+      if (rr) this._roundId = rr.id;                                // remember the active round for writes
+      if (!deals.length) {                                          // empty workspace → seed it from the local demo defaults
+        this.setState({ cloudStatus: "online" });
+        await this.seedWorkspace(orgId);
+        return;
+      }
       const firmById = {}; (firmsR.firms || []).forEach(f => { firmById[f.id] = f; });
       const investors = deals.map(d => this.dealToInvestor(d, firmById[d.firm_id] || {}));
       let round = this.state.round;
-      const rr = (roundsR.rounds || []).find(r => r.is_active) || (roundsR.rounds || [])[0];
       if (rr && rr.data) { try { round = JSON.parse(rr.data); } catch (e) {} }
       this.setState({ investors, round, activeSheetId: investors[0] ? investors[0].id : null, cloudStatus: "online" });
     } catch (e) { /* keep local view */ }
@@ -2701,7 +2714,7 @@ class Component extends DCLogic {
   dealToInvestor(d, f) {
     let x = {}; if (d.data) { try { x = JSON.parse(d.data) || {}; } catch (e) {} }
     return {
-      id: d.id, name: f.name || x.name || "Untitled", sub: f.description || x.sub || f.type || "",
+      id: d.id, name: x.name || f.name || "Untitled", sub: x.sub || f.description || f.type || "",
       stage: d.stage || x.stage || "Not set", owner: d.owner_user_id || x.owner || "Not set",
       confidence: d.confidence || x.confidence || "Not set", role: d.role || x.role || "Not set",
       ticket: (d.ticket_target != null) ? this.centsToTicket(d.ticket_target) : (x.ticket || ""),
@@ -2730,6 +2743,98 @@ class Component extends DCLogic {
   async signOutApi() {
     try { await this.apiFetch("/auth/logout", { method: "POST" }); } catch (e) {}
     this.setState({ apiUser: null, apiOrg: null, needLogin: true });
+  }
+
+  // ── Q. OS backend — Stage 2: write local edits up to the cloud ──
+  // Fully gated: no-op when offline / not in an org / read-only → zero regression on the localStorage path.
+  apiWritable() { return !!(this.state.apiUp && this.state.apiOrg) && !this.isReadOnly(); }
+
+  // "€6M" → 600000000 cents. Inverse of centsToTicket().
+  ticketToCents(str) {
+    const m = parseFloat(String(str || "").replace(/[^0-9.]/g, ""));
+    return isFinite(m) && m > 0 ? Math.round(m * 1e6 * 100) : null;
+  }
+  // Server deal ids are UUIDs; local rows are "seed*", "inv<ts>", "kpmg-*".
+  isServerId(id) { return typeof id === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(id); }
+
+  // Deal body: fill the structured columns (so Stage 1's reader + queries work) AND mirror
+  // every rich field into the `data` JSON column (what dealToInvestor reads back).
+  dealBody(inv, roundId) {
+    return {
+      round_id: roundId,
+      stage: inv.stage, confidence: inv.confidence, role: inv.role,
+      ticket_target: this.ticketToCents(inv.ticket),
+      next_step: inv.context || "",
+      data: JSON.stringify({
+        name: inv.name, sub: inv.sub, stage: inv.stage, owner: inv.owner,
+        confidence: inv.confidence, role: inv.role, ticket: inv.ticket,
+        nextContact: inv.nextContact, context: inv.context,
+        leadCandidate: !!inv.leadCandidate, continue: inv.continue,
+        notes: inv.notes || "", checks: inv.checks || {}, fields: inv.fields || {},
+      }),
+    };
+  }
+  firmBody(inv) {
+    return { name: inv.name || "Untitled", description: inv.sub || "",
+             type: (inv.fields && inv.fields["db:type"]) || "" };
+  }
+
+  // Seed an empty org from the current local investors + round (runs once, from loadFromApi's empty branch).
+  async seedWorkspace(orgId) {
+    const base = "/orgs/" + orgId;
+    let roundId = this._roundId;
+    if (!roundId) {                                          // create the active round if the org has none yet
+      const r = await this.apiFetch(base + "/rounds", { body: {
+        name: this.CONFIG.roundName || "Active round",
+        is_active: 1, target_amount: (this.CONFIG.roundTargetM || 15) * 1e6 * 100,
+        data: JSON.stringify(this.state.round || {}),
+      } });
+      roundId = r.round.id;
+    }
+    this._roundId = roundId;
+    const mapped = [];                                       // firm + deal per local investor; swap local id → server deal id
+    for (const inv of this.state.investors) {
+      const f = await this.apiFetch(base + "/firms", { body: this.firmBody(inv) });
+      const d = await this.apiFetch(base + "/deals", { body: { firm_id: f.firm.id, ...this.dealBody(inv, roundId) } });
+      mapped.push({ ...inv, id: d.deal.id });
+    }
+    this.setState({ investors: mapped }); this.save(mapped);
+  }
+
+  // Debounced upsert of dirty deals + the round.
+  markApiDirty(id) { if (!this.apiWritable()) return; (this._apiDirty ||= new Set()).add(id); this._scheduleApiFlush(); }
+  markRoundApiDirty() { if (!this.apiWritable()) return; this._roundDirtyApi = true; this._scheduleApiFlush(); }
+  _scheduleApiFlush() { clearTimeout(this._apiT); this._apiT = setTimeout(() => this.flushApi(), 1200); }
+  _swapInvestorId(oldId, newId) {
+    this.setState(s => {
+      const investors = s.investors.map(r => r.id === oldId ? { ...r, id: newId } : r);
+      this.save(investors);
+      return { investors, activeSheetId: s.activeSheetId === oldId ? newId : s.activeSheetId };
+    });
+  }
+
+  async flushApi() {
+    if (!this.apiWritable() || !this._roundId) return;      // no round yet → keep dirty set, retry after seeding
+    const base = "/orgs/" + this.state.apiOrg.id, roundId = this._roundId;
+    const ids = [...(this._apiDirty || [])]; this._apiDirty = new Set();
+    for (const id of ids) {
+      const inv = this.state.investors.find(x => x.id === id);
+      if (!inv) {                                            // removed locally → delete on server (only server rows exist there)
+        if (this.isServerId(id)) { try { await this.apiFetch(base + "/deals/" + id, { method: "DELETE" }); } catch (e) {} }
+        continue;
+      }
+      try {
+        if (this.isServerId(id)) {
+          await this.apiFetch(base + "/deals/" + id, { method: "PATCH", body: this.dealBody(inv, roundId) });
+        } else {                                             // new local row → create firm + deal, then adopt the server id
+          const f = await this.apiFetch(base + "/firms", { body: this.firmBody(inv) });
+          const d = await this.apiFetch(base + "/deals", { body: { firm_id: f.firm.id, ...this.dealBody(inv, roundId) } });
+          this._swapInvestorId(id, d.deal.id);
+        }
+      } catch (e) {}
+    }
+    if (this._roundDirtyApi) { this._roundDirtyApi = false;
+      try { await this.apiFetch(base + "/rounds/" + roundId, { method: "PATCH", body: { data: JSON.stringify(this.state.round || {}) } }); } catch (e) {} }
   }
 
   renderVals() {

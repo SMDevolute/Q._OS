@@ -11,7 +11,7 @@ const ENTITIES = {
   rounds: {
     table: "rounds",
     fields: { name: "s", kind: "s", target_amount: "i", currency: "s", premoney: "i",
-              status: "s", open_date: "i", target_close: "i", is_active: "b" },
+              status: "s", open_date: "i", target_close: "i", is_active: "b", data: "s" },
     required: ["name"],
     softDelete: true,
     order: "created_at DESC",
@@ -36,7 +36,7 @@ const ENTITIES = {
   deals: {
     table: "deals",
     fields: { round_id: "s", firm_id: "s", stage: "s", owner_user_id: "s", confidence: "s",
-              role: "s", ticket_target: "i", sort_order: "i", next_step: "s", next_step_due: "i" },
+              role: "s", ticket_target: "i", sort_order: "i", next_step: "s", next_step_due: "i", data: "s" },
     required: ["round_id", "firm_id", "stage"],
     softDelete: true,
     hasUpdatedAt: true,
@@ -72,7 +72,7 @@ const ENTITIES = {
 
 function coerce(field, type, raw) {
   if (raw === null) return null;
-  if (type === "s") { const s = String(raw); if (s.length > 8000) throw new HttpError(400, `${field} too long`); return s; }
+  if (type === "s") { const s = String(raw); const max = field === "data" ? 200000 : 8000; if (s.length > max) throw new HttpError(400, `${field} too long`); return s; }
   if (type === "i") { const n = Math.trunc(Number(raw)); if (!Number.isFinite(n)) throw new HttpError(400, `${field} must be a number`); return n; }
   if (type === "b") return raw ? 1 : 0;
   return raw;
