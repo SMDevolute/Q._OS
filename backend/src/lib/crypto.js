@@ -1,7 +1,7 @@
 // crypto.js — password hashing, token generation, constant-time compare.
 // Uses only WebCrypto (available in Workers). No external deps.
 
-const ITERATIONS = 210000;          // OWASP-recommended floor for PBKDF2-HMAC-SHA256
+const ITERATIONS = 100000;          // Cloudflare Workers' WebCrypto caps PBKDF2 at 100k iterations (higher throws NotSupportedError). This is the supported max.
 const SALT_BYTES = 16;
 const HASH_BITS = 256;
 
