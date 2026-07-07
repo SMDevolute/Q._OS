@@ -805,7 +805,7 @@
   .kb-count { font-family: "Inter", sans-serif; font-size: 11px; font-weight: 600; color: #5b6472; background: #fff; border: 1px solid #e2ded5; border-radius: 20px; padding: 2px 8px; }
   .kb-sum { margin-left: auto; font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 400; color: #2B5C87; }
   .kb-cards { display: flex; flex-direction: column; gap: 9px; padding: 2px 9px 10px; min-height: 40px; max-height: 62vh; overflow-y: auto; }
-  /* KPMG column = inventory, not work: compact rows so the board is about movement */
+  /* Advisor column = inventory, not work: compact rows so the board is about movement */
   .kb-kpmg .kb-cards { gap: 4px; }
   .kb-kpmg .kb-card { padding: 8px 10px 8px 18px; border-radius: 7px; }
   .kb-kpmg .kb-card::before { top: 8px; bottom: 8px; }
@@ -1137,6 +1137,24 @@
   }
 </style>
 </helmet>
+<sc-if value="{{ needLogin }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed; inset:0; z-index:9999; background:#FBFAF8; display:flex; align-items:center; justify-content:center; font-family:'Inter',sans-serif;">
+  <div style="width:360px; max-width:90vw; background:#fff; border:1px solid #e6e3dc; border-radius:16px; padding:32px 30px; box-shadow:0 20px 50px rgba(25,36,50,.10);">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:500; color:#192432; margin-bottom:5px;">{{ authTitle }}</div>
+    <div style="font-size:13px; color:#6b7480; margin-bottom:22px;">Q. Operating System</div>
+    <sc-if value="{{ authIsSignup }}" hint-placeholder-val="{{ false }}">
+      <input type="text" placeholder="Your name" value="{{ authName }}" onInput="{{ onAuthName }}" style="width:100%; box-sizing:border-box; padding:11px 13px; margin-bottom:10px; border:1px solid #d9d5cc; border-radius:9px; font-size:14px; font-family:inherit;">
+    </sc-if>
+    <input type="email" placeholder="Email" value="{{ authEmail }}" onInput="{{ onAuthEmail }}" style="width:100%; box-sizing:border-box; padding:11px 13px; margin-bottom:10px; border:1px solid #d9d5cc; border-radius:9px; font-size:14px; font-family:inherit;">
+    <input type="password" placeholder="Password" value="{{ authPass }}" onInput="{{ onAuthPass }}" style="width:100%; box-sizing:border-box; padding:11px 13px; border:1px solid #d9d5cc; border-radius:9px; font-size:14px; font-family:inherit;">
+    <sc-if value="{{ authErr }}" hint-placeholder-val="">
+      <div style="color:#B23B3B; font-size:12.5px; margin-top:11px; line-height:1.4;">{{ authErr }}</div>
+    </sc-if>
+    <button onClick="{{ doAuth }}" style="width:100%; margin-top:16px; padding:12px; background:#192432; color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; font-family:inherit;">{{ authCta }}</button>
+    <button onClick="{{ toggleAuthMode }}" style="width:100%; margin-top:10px; padding:6px; background:none; border:none; color:#2B5C87; font-size:12.5px; cursor:pointer; font-family:inherit;">{{ authToggleText }}</button>
+  </div>
+</div>
+</sc-if>
 <sc-if value="{{ onLanding }}" hint-placeholder-val="{{ true }}">
 <div class="land">
   <div class="land-top"></div>
@@ -1404,7 +1422,7 @@
         </div>
       </div>
       </sc-if>
-      <p class="legend">Two entry columns: <b>KPMG</b> holds the inherited longlist (history on the card), <b>Lead</b> is for parties we source ourselves. Pull a KPMG card forward when we decide to work it — from Outreach onwards it shows a <b>Notify KPMG</b> flag until the notification is logged on the card. Drag a card to move it through the funnel · drop on <b>FID re-engagement</b> to park a party for post-FID sourcing · click a card for details. New parties enter via the <b>Investor database</b> (data first, then card). KPMG-origin parties: <b>notify KPMG before re-approaching</b>, per the agreement; their per-investor materials may be useful.</p>
+      <p class="legend">Two entry columns: <b>Advisor</b> holds the inherited longlist (history on the card), <b>Lead</b> is for parties we source ourselves. Pull an Advisor card forward when we decide to work it — from Outreach onwards it shows a <b>Notify advisor</b> flag until the notification is logged on the card. Drag a card to move it through the funnel · drop on <b>Follow-on round</b> to park a party for the follow-on round · click a card for details. New parties enter via the <b>Investor database</b> (data first, then card). Advisor-origin parties: <b>notify the advisor before re-approaching</b>, per the agreement; their per-investor materials may be useful.</p>
 
       <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
         <div class="kp-veil" onClick="{{ onPanelClose }}"></div>
@@ -1424,15 +1442,15 @@
             </div>
             <sc-if value="{{ panel.kpmg }}" hint-placeholder-val="{{ false }}">
             <div class="kp-blk">
-              <div class="kp-k" style="margin-bottom:7px;">KPMG contact · inform KPMG before outreach</div>
+              <div class="kp-k" style="margin-bottom:7px;">Advisor · notify the advisor before outreach</div>
               <sc-if value="{{ panel.kpmgWarn }}" hint-placeholder-val="{{ false }}">
-              <div class="kp-kpmg-warn">This card is past Lead and KPMG has not been notified yet.</div>
+              <div class="kp-kpmg-warn">This card is past Lead and the advisor has not been notified yet.</div>
               </sc-if>
               <div class="kp-kpmg-row"><span class="kp-k" style="margin-bottom:0;">Notified on</span><input class="cell-in" defaultValue="{{ panel.kpmgNotified }}" onChange="{{ panel.onKpmgNotified }}" placeholder="e.g. 12 Jul + who told them"></div>
             </div>
             </sc-if>
             <sc-if value="{{ panel.hasCtx }}" hint-placeholder-val="{{ false }}">
-            <div class="kp-blk"><div class="kp-k" style="margin-bottom:7px;">Background / KPMG status</div><div class="kp-ctx">{{ panel.context }}</div></div>
+            <div class="kp-blk"><div class="kp-k" style="margin-bottom:7px;">Background / advisor status</div><div class="kp-ctx">{{ panel.context }}</div></div>
             </sc-if>
             <div class="kp-blk"><div class="kp-k" style="margin-bottom:7px;">Notes</div><textarea class="kp-notes" defaultValue="{{ panel.notes }}" onChange="{{ panel.onNotes }}" placeholder="Working notes for this party"></textarea></div>
             <div class="kp-blk">
@@ -1476,7 +1494,7 @@
       <p class="eyebrow">Records · Investor database</p>
       <h1 class="title">Investor database</h1>
       <div class="sec-rule"></div>
-      <p class="lead-p">The master record of every party we know: identity, segment, contacts and source. Workflow lives on the boards, not here. New investor for the round? <b>First add the data here, then create the card</b>, it appears in the devex Dealflow at Outreach. Parties from the KPMG longlist carry their full outreach history; per the agreement, <b>notify KPMG before re-approaching one</b>.</p>
+      <p class="lead-p">The master record of every party we know: identity, segment, contacts and source. Workflow lives on the boards, not here. New investor for the round? <b>First add the data here, then create the card</b>, it appears in the devex Dealflow at Outreach. Parties from the Advisor longlist carry their full outreach history; per the agreement, <b>notify Advisor before re-approaching one</b>.</p>
       <div class="db-bar">
         <input class="kb-search" value="{{ dbSearch }}" onChange="{{ onDbSearch }}" placeholder="Search investors…">
         <select class="cell-sel" value="{{ dbSeg }}" onChange="{{ onDbSeg }}"><sc-for list="{{ dbSegOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for></select>
@@ -1564,7 +1582,7 @@
               <button class="kp-addc" onClick="{{ dbPanel.onAddContact }}">+ Add contact</button>
             </div>
             <sc-if value="{{ dbPanel.isKpmg }}" hint-placeholder-val="{{ false }}">
-              <div class="kp-blk"><div class="kp-ctx"><b>KPMG longlist.</b> Notify KPMG before re-approaching; their per-investor materials may be available.</div></div>
+              <div class="kp-blk"><div class="kp-ctx"><b>Advisor longlist.</b> Notify Advisor before re-approaching; their per-investor materials may be available.</div></div>
             </sc-if>
             <div class="kp-blk"><span class="kp-k">Notes</span>
               <textarea class="kp-notes" defaultValue="{{ dbPanel.notes.value }}" onChange="{{ dbPanel.notes.onChange }}" placeholder="Anything the team should know"></textarea>
@@ -1731,7 +1749,7 @@
           <div class="sh-pane {{ r.panePrepOff }}">
             <sc-if value="{{ r.hasCtx }}" hint-placeholder-val="{{ false }}">
             <div class="qblock">
-              <div class="qlabel">Background / KPMG status</div>
+              <div class="qlabel">Background / Advisor status</div>
               <div class="ctx-line">{{ r.ctx }}</div>
             </div>
             </sc-if>
@@ -1826,7 +1844,7 @@
               <sc-for list="{{ r.continueOpts }}" as="o" hint-placeholder-count="3">
                 <button class="opt-btn" onClick="{{ o.onToggle }}"><span class="box {{ o.cls }}"></span> {{ o.label }}</button>
               </sc-for>
-              <button class="opt-btn" onClick="{{ r.onFidToggle }}"><span class="box {{ r.fidCls }}"></span> Follow-on round<span class="fid-hint"> · flags them in the FID pipeline</span></button>
+              <button class="opt-btn" onClick="{{ r.onFidToggle }}"><span class="box {{ r.fidCls }}"></span> Follow-on round<span class="fid-hint"> · flags them for the follow-on round</span></button>
             </div>
             <div class="cond-on">
               <span class="cond-lbl">Conditional on</span>
@@ -1908,17 +1926,17 @@
       <p class="eyebrow">Series A · Deal strategy</p>
       <h1 class="title">Deal strategy &amp; coverage</h1>
       <div class="sec-rule"></div>
-      <p class="lead-p">The plan for the {{ roundLabel }} devex round in one page: the structure we're building, where coverage stands today, which syndicate combinations get us there, and the dates that take us to close.</p>
+      <p class="lead-p">The plan for the {{ roundLabel }} Series A in one page: the structure we're building, where coverage stands today, which syndicate combinations get us there, and the dates that take us to close.</p>
 
       <h2 class="blk">1 · Round structure</h2>
       <div class="tgt" style="margin-top:0;">
         <div class="tgt-h">Target syndicate shape, indicative</div>
         <div class="tgt-row">
-          <div class="tgt-tile"><div class="tgt-role">Public anchor</div><div class="tgt-n">EZ via NOM · near-committed</div><div class="tgt-amt">€10M</div></div>
-          <div class="tgt-tile lead"><div class="tgt-role">Lead</div><div class="tgt-n">1 investor</div><div class="tgt-amt">€3–5M</div></div>
-          <div class="tgt-tile"><div class="tgt-role">Co-investors</div><div class="tgt-n">1–3 investors</div><div class="tgt-amt">€1–2M each</div></div>
+          <div class="tgt-tile"><div class="tgt-role">Strategic / public</div><div class="tgt-n">Co-invest · in discussion</div><div class="tgt-amt">€2M</div></div>
+          <div class="tgt-tile lead"><div class="tgt-role">Lead</div><div class="tgt-n">1 investor</div><div class="tgt-amt">€6M</div></div>
+          <div class="tgt-tile"><div class="tgt-role">Co-investors</div><div class="tgt-n">1–3 investors</div><div class="tgt-amt">€2–3M each</div></div>
         </div>
-        <p class="tgt-foot">Indicative shape for the {{ roundLabel }} devex round. AMS Technologies and Fluor have committed €5.95M in fee deferrals, whether these count inside the financing is still to be decided, so the open need is €5–10M beyond the public anchor. Either way, the round needs a lead.</p>
+        <p class="tgt-foot">Indicative shape for the {{ roundLabel }} Series A. A lead anchors price and terms; co-investors and a strategic or public co-investor fill the balance. Either way, the round needs a lead to price and carry governance.</p>
       </div>
 
       <h2 class="blk">2 · Critical path to close</h2>
@@ -1935,7 +1953,7 @@
 
       <h2 class="blk">3 · Positioning &amp; narrative</h2>
       <div class="pf-rows">
-        <div class="pf-row"><div class="pf-term"><div class="t">The pitch in one line</div><div class="h">Momentum line, quote this on every call</div></div><input class="pf-in" defaultValue="{{ round.momentum.value }}" onChange="{{ round.momentum.onChange }}" placeholder="e.g. €10M soft-circled via EZ/NOM, targeting first close October 2026"></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">The pitch in one line</div><div class="h">Momentum line, quote this on every call</div></div><input class="pf-in" defaultValue="{{ round.momentum.value }}" onChange="{{ round.momentum.onChange }}" placeholder="e.g. €8M soft-circled, targeting first close October 2026"></div>
         <div class="pf-row"><div class="pf-term"><div class="t">Target segments &amp; approach</div><div class="h">Who we source and how we get in</div></div><textarea class="pf-in" defaultValue="{{ sa.segments.value }}" onChange="{{ sa.segments.onChange }}" placeholder="VC / family offices / corporate venture / strategics / regional funds, per segment: the angle and the warm route in"></textarea></div>
       </div>
 
@@ -1998,23 +2016,23 @@
       <div class="paths">
         <div class="path-card">
           <div class="pc-tag">Path A</div>
-          <div class="pc-title">All-equity · deferrals outside</div>
-          <ul class="pc-list"><li><b>Public anchor</b> · EZ via NOM €10M</li><li><b>Lead</b> · private, €5–7M <span class="pc-cap">sets price</span></li><li><b>Co-investors</b> · 1–3 to fill to €20M</li></ul>
-          <div class="pc-foot">Cleanest structure: €20M fresh cash, deferrals stay outside the financing. Needs the largest private raise, everything hinges on the lead.</div>
+          <div class="pc-title">Lead-led priced round</div>
+          <ul class="pc-list"><li><b>Lead</b> · private, €6M <span class="pc-cap">sets price</span></li><li><b>Co-investors</b> · 1–3 to fill to {{ roundLabel }}</li><li><b>Strategic / public</b> · optional €2M co-invest</li></ul>
+          <div class="pc-foot">Cleanest structure: a lead prices the round and co-investors fill behind them. Everything hinges on landing the lead.</div>
           <div class="pc-trig"><span class="pc-trig-k">Switch trigger</span><input class="pc-trig-in" defaultValue="{{ round.scnA.value }}" onChange="{{ round.scnA.onChange }}" placeholder="e.g. no lead in serious DD by 1 Sep → switch to B"></div>
         </div>
         <div class="path-card">
           <div class="pc-tag">Path B</div>
-          <div class="pc-title">Deferrals counted in</div>
-          <ul class="pc-list"><li><b>Public anchor</b> · EZ via NOM €10M</li><li><b>Deferrals</b> · AMS + Fluor €5.95M <span class="pc-cap">no cash</span></li><li><b>Lead</b> · private, ~€4–5M open</li></ul>
-          <div class="pc-foot">Smallest private ask, fastest close, but less fresh cash in the round and a lead is still required to price and carry governance.</div>
-          <div class="pc-trig"><span class="pc-trig-k">Switch trigger</span><input class="pc-trig-in" defaultValue="{{ round.scnB.value }}" onChange="{{ round.scnB.onChange }}" placeholder="e.g. deferral decision due, align with AMS / Fluor by 15 Aug"></div>
+          <div class="pc-title">Strategic-anchored</div>
+          <ul class="pc-list"><li><b>Strategic / public</b> · €2–4M in early <span class="pc-cap">de-risks</span></li><li><b>Lead</b> · private, €4–5M</li><li><b>Co-investors</b> · fill the balance</li></ul>
+          <div class="pc-foot">Bringing a strategic or public co-investor in early signals validation and de-risks the raise, but a lead is still required to price and carry governance.</div>
+          <div class="pc-trig"><span class="pc-trig-k">Switch trigger</span><input class="pc-trig-in" defaultValue="{{ round.scnB.value }}" onChange="{{ round.scnB.onChange }}" placeholder="e.g. anchor a strategic co-investor by 15 Aug"></div>
         </div>
         <div class="path-card">
           <div class="pc-tag">Path C</div>
           <div class="pc-title">Hybrid · debt / convertible top-up</div>
-          <ul class="pc-list"><li><b>Public anchor</b> · EZ via NOM €10M</li><li><b>Equity lead</b> · smaller ticket, €3–4M</li><li><b>Debt / convertible</b> · bridge tranche to FID</li></ul>
-          <div class="pc-foot">Fallback if equity appetite stalls: venture debt or a convertible carries the gap to FID. Watch cost of capital and conversion terms into the FID round.</div>
+          <ul class="pc-list"><li><b>Equity lead</b> · smaller ticket, €3–4M</li><li><b>Co-investors</b> · fill part of the round</li><li><b>Debt / convertible</b> · bridge tranche to close</li></ul>
+          <div class="pc-foot">Fallback if equity appetite stalls: venture debt or a convertible carries the gap to close and converts into the next round. Watch cost of capital and conversion terms.</div>
           <div class="pc-trig"><span class="pc-trig-k">Switch trigger</span><input class="pc-trig-in" defaultValue="{{ round.scnC.value }}" onChange="{{ round.scnC.onChange }}" placeholder="e.g. fallback, decide by 15 Sep to protect the Oct close"></div>
         </div>
       </div>
@@ -2095,26 +2113,26 @@
       <p class="legend">Files stay in your dataroom / Drive, this register holds the single current link per document, synced with the team. Update the version field when a new file replaces the old one.</p>
     </section>
 
-    <section class="screen {{ secPfStrategy }}" data-screen-label="Post-FID deal strategy">
+    <section class="screen {{ secPfStrategy }}" data-screen-label="Follow-on round deal strategy">
       <p class="eyebrow">Follow-on round · Deal strategy</p>
       <h1 class="title">Deal strategy</h1>
       <div class="sec-rule"></div>
-      <p class="lead-p">The next campaign: at <b>Final Investment Decision</b>, <b>€650M–1.3B</b> of project capital will be raised for the polysilicon plant. Investors who pass on the devex round but want in at FID land in this round's dealflow. Sketch the strategy here, it sharpens with every conversation.</p>
+      <p class="lead-p">The next campaign: planning the follow-on round now, while this one is still live. Investors who are too large or too late-stage for this round — but want in at the next, larger raise — land in this round's dealflow. Sketch the strategy here, it sharpens with every conversation.</p>
       <div class="pf-rows">
-        <div class="pf-row"><div class="pf-term"><div class="t">Target raise</div><div class="h">Range at FID</div></div><input class="pf-in" defaultValue="{{ pf.raise.value }}" onChange="{{ pf.raise.onChange }}" placeholder="€650M–1.3B, phasing / tranches"></div>
-        <div class="pf-row"><div class="pf-term"><div class="t">Instrument mix</div><div class="h">Equity / debt / subsidies</div></div><textarea class="pf-in" defaultValue="{{ pf.mix.value }}" onChange="{{ pf.mix.onChange }}" placeholder="e.g. project equity, senior debt, export credit, EU / national subsidy stack"></textarea></div>
-        <div class="pf-row"><div class="pf-term"><div class="t">Target investor profile</div><div class="h">Who leads a raise this size</div></div><textarea class="pf-in" defaultValue="{{ pf.profile.value }}" onChange="{{ pf.profile.onChange }}" placeholder="e.g. infra funds, pension capital (PGGM), sovereign / strategic anchors"></textarea></div>
-        <div class="pf-row"><div class="pf-term"><div class="t">Timing &amp; trigger</div><div class="h">When re-engagement starts</div></div><input class="pf-in" defaultValue="{{ pf.timing.value }}" onChange="{{ pf.timing.onChange }}" placeholder="e.g. FID expected __ · re-engage 6 months ahead"></div>
-        <div class="pf-row"><div class="pf-term"><div class="t">Positioning vs devex</div><div class="h">The bridge story</div></div><textarea class="pf-in" defaultValue="{{ pf.position.value }}" onChange="{{ pf.position.onChange }}" placeholder="What the devex round must prove so FID capital commits"></textarea></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">Target raise</div><div class="h">Range for the follow-on</div></div><input class="pf-in" defaultValue="{{ pf.raise.value }}" onChange="{{ pf.raise.onChange }}" placeholder="Target range, phasing / tranches"></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">Instrument mix</div><div class="h">Equity / debt / other</div></div><textarea class="pf-in" defaultValue="{{ pf.mix.value }}" onChange="{{ pf.mix.onChange }}" placeholder="e.g. growth equity, venture debt, strategic / corporate capital, public co-invest"></textarea></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">Target investor profile</div><div class="h">Who leads a raise this size</div></div><textarea class="pf-in" defaultValue="{{ pf.profile.value }}" onChange="{{ pf.profile.onChange }}" placeholder="e.g. growth funds, crossover investors, strategic / corporate anchors"></textarea></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">Timing &amp; trigger</div><div class="h">When re-engagement starts</div></div><input class="pf-in" defaultValue="{{ pf.timing.value }}" onChange="{{ pf.timing.onChange }}" placeholder="e.g. follow-on expected __ · re-engage 6 months ahead"></div>
+        <div class="pf-row"><div class="pf-term"><div class="t">Positioning vs this round</div><div class="h">The bridge story</div></div><textarea class="pf-in" defaultValue="{{ pf.position.value }}" onChange="{{ pf.position.onChange }}" placeholder="What this round must prove so the follow-on capital commits"></textarea></div>
       </div>
       <p class="legend">Synced with the team · the dealflow for this round lives under <b>Dealflow</b> in this menu group.</p>
     </section>
 
-    <section class="screen {{ secFid }}" data-screen-label="Post-FID dealflow">
+    <section class="screen {{ secFid }}" data-screen-label="Follow-on round dealflow">
       <p class="eyebrow">Follow-on round · Dealflow</p>
       <h1 class="title">Dealflow</h1>
       <div class="sec-rule"></div>
-      <p class="lead-p">Parties committed to a conversation at <b>FID</b>, including investors who pass on the devex round but want in at project scale. A party dropped on <b>FID re-engagement</b> in the devex Dealflow lands here automatically. Drag cards as the relationship warms up; click a card for details and the re-engage note.</p>
+      <p class="lead-p">Parties committed to a conversation at the follow-on round, including investors who pass on this round but want in at the next, larger raise. A party dropped on <b>Follow-on round</b> in the Dealflow lands here automatically. Drag cards as the relationship warms up; click a card for details and the re-engage note.</p>
       <div class="kb-scroll">
         <div class="kb">
           <sc-for list="{{ pfCols }}" as="col" hint-placeholder-count="3">
@@ -2134,10 +2152,10 @@
         </div>
       </div>
       <div class="fid-add">
-        <span class="fid-add-k">Flag a party from the pipeline for FID:</span>
+        <span class="fid-add-k">Flag a party from the pipeline for the follow-on round:</span>
         <select class="cell-sel" value="" onChange="{{ onFidAdd }}"><option value="">Choose…</option><sc-for list="{{ fidOptions }}" as="o"><option value="{{ o.id }}">{{ o.name }}</option></sc-for></select>
       </div>
-      <p class="legend">Flagged parties stay in the devex Dealflow too, this is the post-FID campaign view, synced with the team.</p>
+      <p class="legend">Flagged parties stay in the Dealflow too — this is the follow-on campaign view, synced with the team.</p>
     </section>
 
   </main>
@@ -2165,6 +2183,7 @@ class Component extends DCLogic {
     syncRoom: "q-os-acquire-dev",
     storeKey: "q_os_acquire_v2",
     roundKey: "q_os_acquire_round_v2",
+    apiBase: "/api",                            // Q. OS backend (same-origin). Auto-detected; falls back to local if unreachable.
     seedInvestors: [
       // [name, sub, stage, owner, nextContact, context, leadCandidate, continue, role, ticket, confidence]
       ["Atlas Ventures", "Climate VC \u00b7 potential lead", "Pitch", "Alex Rivera", "Not set", "Keen to lead; asked for the updated model and use of funds before committing.", true, "Yes", "Lead", "\u20ac6M", "Probable"],
@@ -2176,13 +2195,13 @@ class Component extends DCLogic {
     ],
   };
   // ════════════════════════════════════════════════
-  STAGES = ["Not set", "KPMG", "Lead", "Outreach", "In conversation", "Pitch", "Consideration", "Dataroom", "Secured", "Closed lost"];
+  STAGES = ["Not set", "Advisor", "Lead", "Outreach", "In conversation", "Pitch", "Consideration", "Dataroom", "Secured", "Closed lost"];
 
-  // KPMG-origin records: seeded rows (inv1..invN) and longlist imports (kpmg-*).
-  // Agreement with KPMG: they are informed before we approach one of their contacts.
+  // Advisor-origin records: seeded rows (inv1..invN) and longlist imports (kpmg-*).
+  // Agreement with Advisor: they are informed before we approach one of their contacts.
   isKpmg(r) { return !!r && (/^kpmg-/.test(r.id || "") || /^inv\d{1,3}$/.test(r.id || "")); }
   needsKpmgNotify(r) {
-    return this.isKpmg(r) && r.stage && !["Not set", "KPMG", "Lead"].includes(r.stage)
+    return this.isKpmg(r) && r.stage && !["Not set", "Advisor", "Lead"].includes(r.stage)
       && !(r.fields && (r.fields.kpmgNotified || "").trim());
   }
   OWNERS = ["Not set", ...this.CONFIG.owners];
@@ -2214,7 +2233,9 @@ class Component extends DCLogic {
   STORE_KEY = this.CONFIG.storeKey;
   ROUND_KEY = this.CONFIG.roundKey;
   state = { investors: [], activeSection: 0, activeSheetId: null, round: {}, cloudStatus: "local", logDraft: {},
-            entered: true };  // Acquire is a module — you arrive already inside Q. OS. Landing lives in the shell.
+            entered: true,  // Acquire is a module — you arrive already inside Q. OS. Landing lives in the shell.
+            apiUp: false, needLogin: false, apiUser: null, apiOrg: null,
+            authMode: "login", authEmail: "", authPass: "", authName: "", authBusy: false, authErr: "" };
 
   defaults() {
     return (this.CONFIG.seedInvestors || []).map((r, i) => ({
@@ -2227,8 +2248,8 @@ class Component extends DCLogic {
   componentDidMount() {
     let data = null;
     try { const s = localStorage.getItem(this.STORE_KEY); if (s) data = JSON.parse(s); } catch (e) {}
-    if (data && data.length) { const fx = v => v === "-" ? "Not set" : v;
-      data = data.map(r => ({ ...r, stage: fx(r.stage), owner: fx(r.owner), continue: fx(r.continue), role: fx(r.role), nextContact: fx(r.nextContact) })); }
+    if (data && data.length) { const fx = v => v === "-" ? "Not set" : v; const fxStage = v => (fx(v) === "KPMG") ? "Advisor" : fx(v);
+      data = data.map(r => ({ ...r, stage: fxStage(r.stage), owner: fx(r.owner), continue: fx(r.continue), role: fx(r.role), nextContact: fx(r.nextContact) })); }
     let investors = (data && data.length) ? data : this.defaults();
     investors = this.migrateOwners(investors);
     let round = {};
@@ -2243,23 +2264,23 @@ class Component extends DCLogic {
       investors.forEach(r => { if (this.cloudEnabled()) this._dirty.add(r.id); });
       this._dirtyRound = true;
     }
-    // follow-up: EZ co-investment via NOM is €10M (was €7M convertible)
+    // follow-up: (deal-specific reconciliation retired for the generic build)
     if (!round.confFix0726b) {
-      investors = investors.map(r => (r.name || "").match(/^NOM$|EZ/i)
+      investors = investors.map(r => (r.name || "").match(/^__none__$/i)
         ? { ...r, ticket: "\u20ac10M", confidence: "Probable" } : r);
       round = { ...round, confFix0726b: true };
       this.save(investors); this.saveRound(round);
       investors.forEach(r => { if (this.cloudEnabled()) this._dirty.add(r.id); });
       this._dirtyRound = true;
     }
-    // Split entry columns: KPMG-origin parties wait in their own "KPMG" column, "Lead" is for
-    // own sourcing. KPMG rows sitting at Lead move back one column. Idempotent.
+    // Split entry columns: Advisor-origin parties wait in their own "Advisor" column, "Lead" is for
+    // own sourcing. Advisor rows sitting at Lead move back one column. Idempotent.
     if (!round.kpmgStage0705e) {
-      const preEngaged = (r) => (r.name || "").match(/\b(NOM|EZK?|AMS|Fluor|RVO)\b/i) || (r.fields && r.fields.fid === "Yes");
+      const preEngaged = (r) => (r.name || "").match(/\b(__none__)\b/i) || (r.fields && r.fields.fid === "Yes");
       investors = investors.map(r => {
-        let out = (this.isKpmg(r) && r.stage === "Lead") ? { ...r, stage: "KPMG" } : r;
-        // already-engaged parties (EZ/NOM, AMS, Fluor, RVO, FID-parked) predate the reset:
-        // KPMG knows about these relationships, so no notify flag on them.
+        let out = (this.isKpmg(r) && r.stage === "Lead") ? { ...r, stage: "Advisor" } : r;
+        // already-engaged parties (pre-flagged) predate the reset:
+        // Advisor knows about these relationships, so no notify flag on them.
         if (this.isKpmg(out) && preEngaged(out) && !(out.fields && (out.fields.kpmgNotified || "").trim()))
           out = { ...out, fields: { ...(out.fields || {}), kpmgNotified: "Pre-reset relationship" } };
         return out;
@@ -2269,13 +2290,13 @@ class Component extends DCLogic {
       investors.forEach(r => { if (this.cloudEnabled()) this._dirty.add(r.id); });
       this._dirtyRound = true;
     }
-    // KPMG funnel reset (July 2026): the KPMG list is history, not our funnel. Every KPMG-origin
+    // Advisor funnel reset (July 2026): the Advisor list is history, not our funnel. Every Advisor-origin
     // record restarts as "Lead" (known, not yet approached with the sharpened proposition).
-    // Exceptions keep their stage: live parties (EZ/NOM, AMS, Fluor, RVO) and FID re-engagement.
+    // Exceptions keep their stage: already-engaged parties and follow-on re-engagement.
     if (!round.kpmgLeadReset0705e) {
-      const keep = (r) => (r.name || "").match(/\b(NOM|EZK?|AMS|Fluor|RVO)\b/i) || (r.fields && r.fields.fid === "Yes");
-      investors = investors.map(r => (this.isKpmg(r) && !keep(r) && r.stage !== "KPMG")
-        ? { ...r, stage: "KPMG" } : r);
+      const keep = (r) => (r.name || "").match(/\b(__none__)\b/i) || (r.fields && r.fields.fid === "Yes");
+      investors = investors.map(r => (this.isKpmg(r) && !keep(r) && r.stage !== "Advisor")
+        ? { ...r, stage: "Advisor" } : r);
       round = { ...round, kpmgLeadReset0705: true, kpmgLeadReset0705e: true };
       this.save(investors); this.saveRound(round);
       investors.forEach(r => { if (this.cloudEnabled()) this._dirty.add(r.id); });
@@ -2284,12 +2305,7 @@ class Component extends DCLogic {
     this.setState({ investors, round, activeSheetId: investors[0] ? investors[0].id : null });
     if (this.cloudEnabled()) this.startSync();
     this.checkGmail();
-    // one-time merge of the KPMG longlist (idempotent: stable ids + name dedupe, respects deletions)
-    setTimeout(() => {
-      // On the Worker build the list is injected as a global (dynamic import is unreliable there)
-      if (typeof window !== "undefined" && window.HELIOS_LONGLIST) this.mergeLonglist(window.HELIOS_LONGLIST);
-      else import("./helios-longlist.js").then(m => this.mergeLonglist(m.HELIOS_LONGLIST)).catch(() => {});
-    }, this.cloudEnabled() ? 3000 : 0);
+    this.initApi();
   }
 
   mergeLonglist(list) {
@@ -2303,9 +2319,9 @@ class Component extends DCLogic {
         if (!key || have.has(key)) return;
         const id = "kpmg-" + key.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
         if (dead[id]) return;
-        // funnel policy: merged KPMG rows enter the KPMG column, except live parties and FID-parked
-        const live = (o.name || "").match(/\b(NOM|EZK?|AMS|Fluor|RVO)\b/i) || o.fid;
-        add.push({ id, name: o.name, sub: o.sub || "", stage: live ? (o.stage || "Not set") : "KPMG", owner: "Not set",
+        // funnel policy: merged Advisor rows enter the Advisor column, except live parties and FID-parked
+        const live = (o.name || "").match(/\b(__none__)\b/i) || o.fid;
+        add.push({ id, name: o.name, sub: o.sub || "", stage: live ? (o.stage || "Not set") : "Advisor", owner: "Not set",
           nextContact: "Not set", context: o.context || "", leadCandidate: false,
           continue: o.cont || "Not set", role: "Not set", ticket: "", notes: "", confidence: "Not set",
           checks: {}, fields: { kpmgCol: "Yes", ...(o.fid ? { fid: "Yes" } : {}) } });
@@ -2440,13 +2456,13 @@ class Component extends DCLogic {
       let cs = []; try { cs = JSON.parse((r.fields || {})["db:contacts"] || "[]"); } catch (e) {}
       rows.push([r.name, r.sub, r.stage, r.owner, r.role, r.ticket, r.confidence, r.nextContact,
         cs.map(c => c.n).filter(Boolean).join("; "), cs.map(c => c.e).filter(Boolean).join("; "),
-        this.isKpmg(r) ? "KPMG longlist" : "Team", r.notes]);
+        this.isKpmg(r) ? "Advisor longlist" : "Team", r.notes]);
     });
     const csv = rows.map(row => row.map(esc).join(",")).join("\r\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "helios-investors.csv";
+    a.download = "acquire-investors.csv";
     a.click();
   }
 
@@ -2637,6 +2653,85 @@ class Component extends DCLogic {
     return isNaN(d) ? 0 : d;
   }
 
+  // ── Q. OS backend — Stage 1: login gate + load (auto-detects; falls back to local) ──
+  apiBase() { return this.CONFIG.apiBase || "/api"; }
+  async apiFetch(path, opts = {}) {
+    const res = await fetch(this.apiBase() + path, {
+      credentials: "include",
+      method: opts.method || (opts.body ? "POST" : "GET"),
+      headers: opts.body ? { "Content-Type": "application/json" } : undefined,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+    const ct = res.headers.get("content-type") || "";
+    let data = {};
+    if (ct.includes("application/json")) { try { data = await res.json(); } catch (e) {} }
+    if (!res.ok) { const err = new Error(data.error || ("HTTP " + res.status)); err.status = res.status; throw err; }
+    return data;
+  }
+  async initApi() {
+    let res;
+    try { res = await fetch(this.apiBase() + "/auth/me", { credentials: "include" }); }
+    catch (e) { return; }                          // no backend (e.g. local preview) → stay fully local
+    const ct = res.headers.get("content-type") || "";
+    if (!res.ok || !ct.includes("application/json")) return;
+    let me; try { me = await res.json(); } catch (e) { return; }
+    if (!me || !("user" in me)) return;            // not our API → stay local
+    this.setState({ apiUp: true });
+    if (!me.user) { this.setState({ needLogin: true }); return; }
+    const org = (me.orgs && me.orgs[0]) || null;
+    this.setState({ apiUser: me.user, apiOrg: org, needLogin: false });
+    if (org) this.loadFromApi(org.id);
+  }
+  async loadFromApi(orgId) {
+    try {
+      const base = "/orgs/" + orgId;
+      const [dealsR, firmsR, roundsR] = await Promise.all([
+        this.apiFetch(base + "/deals"), this.apiFetch(base + "/firms"), this.apiFetch(base + "/rounds"),
+      ]);
+      const deals = dealsR.deals || [];
+      if (!deals.length) { this.setState({ cloudStatus: "online" }); return; }  // empty workspace → keep local view
+      const firmById = {}; (firmsR.firms || []).forEach(f => { firmById[f.id] = f; });
+      const investors = deals.map(d => this.dealToInvestor(d, firmById[d.firm_id] || {}));
+      let round = this.state.round;
+      const rr = (roundsR.rounds || []).find(r => r.is_active) || (roundsR.rounds || [])[0];
+      if (rr && rr.data) { try { round = JSON.parse(rr.data); } catch (e) {} }
+      this.setState({ investors, round, activeSheetId: investors[0] ? investors[0].id : null, cloudStatus: "online" });
+    } catch (e) { /* keep local view */ }
+  }
+  dealToInvestor(d, f) {
+    let x = {}; if (d.data) { try { x = JSON.parse(d.data) || {}; } catch (e) {} }
+    return {
+      id: d.id, name: f.name || x.name || "Untitled", sub: f.description || x.sub || f.type || "",
+      stage: d.stage || x.stage || "Not set", owner: d.owner_user_id || x.owner || "Not set",
+      confidence: d.confidence || x.confidence || "Not set", role: d.role || x.role || "Not set",
+      ticket: (d.ticket_target != null) ? this.centsToTicket(d.ticket_target) : (x.ticket || ""),
+      nextContact: x.nextContact || "Not set", context: d.next_step || x.context || "",
+      leadCandidate: !!x.leadCandidate, continue: x.continue || "Not set",
+      notes: x.notes || "", checks: x.checks || {}, fields: x.fields || {},
+    };
+  }
+  centsToTicket(c) { const m = (Number(c) / 100) / 1e6; return "\u20ac" + (Math.round(m * 100) / 100) + "M"; }
+  async doAuth() {
+    const mode = this.state.authMode || "login";
+    const email = (this.state.authEmail || "").trim();
+    const password = this.state.authPass || "";
+    const name = (this.state.authName || "").trim();
+    if (!email || !password) { this.setState({ authErr: "Enter your email and password." }); return; }
+    this.setState({ authBusy: true, authErr: "" });
+    try {
+      const path = "/auth/" + (mode === "signup" ? "signup" : "login");
+      await this.apiFetch(path, { body: mode === "signup" ? { email, name, password } : { email, password } });
+      this.setState({ authBusy: false, authPass: "" });
+      await this.initApi();
+    } catch (e) {
+      this.setState({ authBusy: false, authErr: (e && e.message) || "Sign-in failed." });
+    }
+  }
+  async signOutApi() {
+    try { await this.apiFetch("/auth/logout", { method: "POST" }); } catch (e) {}
+    this.setState({ apiUser: null, apiOrg: null, needLogin: true });
+  }
+
   renderVals() {
     const cls = { "Consideration": "consideration", "Dataroom": "dataroom", "Potential co-investor": "coinvestor" };
     const investors = this.state.investors;
@@ -2659,7 +2754,7 @@ class Component extends DCLogic {
     const sa = { changed: rf("sa_changed"), segments: rf("sa_segments") };
 
     // A sheet counts as "started" only on actual call-sheet input: a ticked option, a filled
-    // sheet field, or a logged call. Database fields (db:*), imported KPMG context, notes,
+    // sheet field, or a logged call. Database fields (db:*), imported Advisor context, notes,
     // FID flags and stage history do NOT count.
     const SHEET_EXCLUDE = ["fid", "hist", "stagelog", "notes"];
     const isCaptured = (r) => (r.checks && Object.keys(r.checks).length > 0)
@@ -2734,12 +2829,12 @@ class Component extends DCLogic {
         hasLog: logArr.length > 0,
         segType: mkSeg("party:type", this.PARTY_TYPES),
         typeHint: ({
-          "VC": "VCs weigh return, ownership and exit path - expect diligence on the FID financing and dilution; price discipline and clean terms matter most.",
-          "Corporate / strategic": "Strategics weigh commercial value, supply security, exclusivity and market access - surface those, not just the equity terms. Watch rights that constrain the FID round.",
-          "Family office": "Family offices decide on conviction and people - fewer committees, faster yes/no. Mission and the NL industrial angle often land well; keep materials simple.",
-          "Infra / PE": "Infra and PE funds think in project risk, downside protection and capital structure - lead with the FID plan, offtake and the public anchor.",
-          "Regional / public": "Public and regional funds weigh mandate fit, regional impact and co-financing conditions - point to the EZ/NOM anchor and expect formal process and timelines.",
-          "Debt provider": "Debt and convertible providers weigh security, cost of capital and conversion into the FID round - keep equity story short, focus on downside and repayment path.",
+          "VC": "VCs weigh return, ownership and exit path - expect diligence on the model and dilution; price discipline and clean terms matter most.",
+          "Corporate / strategic": "Strategics weigh commercial value, supply security, exclusivity and market access - surface those, not just the equity terms. Watch rights that constrain the next round.",
+          "Family office": "Family offices decide on conviction and people - fewer committees, faster yes/no. Mission and the industrial angle often land well; keep materials simple.",
+          "Infra / PE": "Infra and PE funds think in downside protection and capital structure - lead with the plan, unit economics and any strategic or public co-investor.",
+          "Regional / public": "Public and regional funds weigh mandate fit, regional impact and co-financing conditions - point to any strategic or public co-investor and expect formal process and timelines.",
+          "Debt provider": "Debt and convertible providers weigh security, cost of capital and conversion into the next round - keep equity story short, focus on downside and repayment path.",
         }[fget("party:type")] || "Set the segment - each type weighs a different part of the story."),
         pickRisk: mkPick("why:risk", this.RISK_CATS),
         pickObj: mkPick("why:obj", this.OBJ_CATS),
@@ -2753,7 +2848,7 @@ class Component extends DCLogic {
         onTabPrep: () => this.setState({ sheetTab: "prep" }), onTabNotes: () => this.setState({ sheetTab: "notes" }), onTabDebrief: () => this.setState({ sheetTab: "debrief" }),
         panePrepOff: shTab === "prep" ? "" : "off", paneNotesOff: shTab === "notes" ? "" : "off", paneDebriefOff: shTab === "debrief" ? "" : "off",
         typeOpts: mkOpts("type", ["Financial", "Strategic / corporate", "Public / fund-of-funds"]),
-        continueOpts: mkOpts("cont", ["Yes, devex round", "Conditional", "No"]),
+        continueOpts: mkOpts("cont", ["Yes, this round", "Conditional", "No"]),
         fidCls: (r.fields && r.fields.fid === "Yes") ? "checked" : "",
         onFidToggle: () => this.setField(r.id, "fid", (r.fields && r.fields.fid === "Yes") ? "" : "Yes"),
         condOpts: mkOpts("cond", ["Lead in place", "Valuation agreed", "Co-investors confirmed", "Due diligence", "IC approval", "Other"]),
@@ -2850,7 +2945,7 @@ class Component extends DCLogic {
       count: covInv.length,
       defShow: defM > 0, defM: fmt(defM),
       defOpts: ["Counted", "Excluded"].map(l => ({ label: l, cls: defMode === l ? "on" : "", onPick: () => this.setRound("defIncl", l) })),
-      defNote: "AMS Technologies + Fluor fee deferrals. " + (defDecided
+      defNote: "Partner / supplier fee deferrals. " + (defDecided
         ? (defMode === "Excluded" ? "Excluded from coverage: deferrals sit outside the financing, so more new money is needed." : "Counted toward the target.")
         : "Final treatment still to be decided, toggle to see the round both ways."),
     };
@@ -2950,7 +3045,7 @@ class Component extends DCLogic {
     };
     const isDue = (r) => { const t = this.parseDate(r.nextContact); return !!t && t < Date.now(); };
     const mkCard = (r) => {
-      const seg = (r.sub || "").replace(/\s*·\s*KPMG longlist\s*$/i, "");
+      const seg = (r.sub || "").replace(/\s*·\s*Advisor longlist\s*$/i, "");
       const log = (r.fields && Array.isArray(r.fields.stagelog)) ? r.fields.stagelog : [];
       const lastT = log.length ? log[log.length - 1].t : 0;
       const days = lastT ? Math.max(0, Math.round((Date.now() - lastT) / 86400000)) : null;
@@ -2965,8 +3060,8 @@ class Component extends DCLogic {
       if (r.fields && r.fields.fid === "Yes") chips.push({ t: "FID", cls: "kc-fid" });
       if (days !== null && days > 14 && ["Outreach", "In conversation", "Pitch", "Consideration", "Dataroom"].includes(r.stage))
         chips.push({ t: "stale " + days + "d", cls: "kc-stale" });
-      if (this.needsKpmgNotify(r)) chips.push({ t: "Notify KPMG", cls: "kc-kpmg" });
-      else if (this.isKpmg(r)) chips.push({ t: "KPMG", cls: "kc-src" });
+      if (this.needsKpmgNotify(r)) chips.push({ t: "Notify Advisor", cls: "kc-kpmg" });
+      else if (this.isKpmg(r)) chips.push({ t: "Advisor", cls: "kc-src" });
       else chips.push({ t: "Own lead", cls: "kc-src-own" });
       const hasNext = !!(r.nextContact && r.nextContact !== "Not set");
       return {
@@ -3006,8 +3101,8 @@ class Component extends DCLogic {
       const key = "kbdrop:" + name;
       const sumM = list.reduce((a, r) => a + this.parseM(r.ticket), 0);
       const hints = {
-        "KPMG": "The inherited longlist is empty - all parties are being worked.",
-        "Lead": "Own sourcing starts here. Add a party via + Card, or pull a KPMG card forward to work it.",
+        "Advisor": "The inherited longlist is empty - all parties are being worked.",
+        "Lead": "Own sourcing starts here. Add a party via + Card, or pull a Advisor card forward to work it.",
         "Outreach": "Drag a card here when the first approach goes out.",
         "In conversation": "First call scheduled or held.",
         "Pitch": "Management pitch planned or done.",
@@ -3015,7 +3110,7 @@ class Component extends DCLogic {
         "Dataroom": "Diligence under way.",
         "Secured": "Signed or firmly committed.",
         "Closed lost": "Passed for this round - history stays on the card.",
-        "FID re-engagement": "Drop a card here to park a party for the post-FID round.",
+        "Follow-on round": "Drop a card here to park a party for the follow-on round.",
       };
       return {
         name, count: list.length, sum: sumM > 0 ? "€" + (Math.round(sumM * 10) / 10) + "M" : "",
@@ -3025,17 +3120,17 @@ class Component extends DCLogic {
         cards: list.map(mkCard),
         onDragOver: (e) => { e.preventDefault(); if (!this.state[key]) this.setState({ [key]: true }); },
         onDragLeave: () => { if (this.state[key]) this.setState({ [key]: false }); },
-        onDrop: (e) => { e.preventDefault(); this.setState({ [key]: false }); dragTo(this._dragId, name, name === "FID re-engagement"); this._dragId = null; },
+        onDrop: (e) => { e.preventDefault(); this.setState({ [key]: false }); dragTo(this._dragId, name, name === "Follow-on round"); this._dragId = null; },
       };
     };
     // board shows only carded parties: "Not set" = database-only, no card yet
     const kbCols = [
       ...this.STAGES.filter(st => st !== "Not set").map(st => {
         let colList = investors.filter(r => r.stage === st && !fidSet(r));
-        if (st === "KPMG") colList = colList.slice().sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
-        return mkCol(st, colList, st === "Closed lost" ? "kb-lost" : (st === "KPMG" ? "kb-kpmg" : ""));
+        if (st === "Advisor") colList = colList.slice().sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
+        return mkCol(st, colList, st === "Closed lost" ? "kb-lost" : (st === "Advisor" ? "kb-kpmg" : ""));
       }),
-      mkCol("FID re-engagement", investors.filter(fidSet), "kb-fid"),
+      mkCol("Follow-on round", investors.filter(fidSet), "kb-fid"),
     ];
     // post-FID board: same card structure, own stages (fid:stage)
     const pfStageOf = (r) => (r.fields && r.fields["fid:stage"]) || "Parked";
@@ -3121,9 +3216,9 @@ class Component extends DCLogic {
     }));
     const addDoc = () => setDocs([...docsArr, { id: "doc" + Date.now(), name: "", cat: "Pitch deck", ver: "", owner: "Not set", url: "" }]);
 
-    const navDefs = [["00", "Overview"], ["01", "Pipeline tracker"], ["02", "Our mandate"], ["03", "Call sheets"], ["04", "Round coverage"], ["05", "FID pipeline"]];
+    const navDefs = [["00", "Overview"], ["01", "Pipeline tracker"], ["02", "Our mandate"], ["03", "Call sheets"], ["04", "Round coverage"], ["05", "Follow-on round"]];
 
-    // ── FID pipeline (05): parties to re-engage at Final Investment Decision ──
+    // ── Follow-on round (05): parties to re-engage at the next, larger raise ──
     const fidRows = investors.filter(r => r.fields && r.fields.fid === "Yes").map(r => ({
       name: r.name || "Untitled", sub: r.sub || "", context: r.context || "",
       owner: r.owner || "Not set",
@@ -3171,7 +3266,7 @@ class Component extends DCLogic {
     const segOf = (r) => (((r.sub || "").split("\u00b7")[0]) || "").trim() || "Other";
     const dbSearch = this.state.dbSearch || "", dbStage = this.state.dbStage || "All stages",
           dbOwner = this.state.dbOwner || "All owners", dbSeg = this.state.dbSeg || "All segments";
-    // Records database: master data only. A party gets a CARD on the devex board via "+ Card";
+    // Records database: master data only. A party gets a CARD on the board via "+ Card";
     // until then it lives here with stage "Not set".
     const dbF = (r, key) => ({ value: (r.fields && r.fields[key]) || "", onChange: (e) => this.setField(r.id, key, e.target.value) });
     // multi-contact storage: JSON array in fields["db:contacts"]; legacy db:contact/db:email seed the first entry
@@ -3385,7 +3480,7 @@ class Component extends DCLogic {
       const cSet = (i, k, v) => { const a = contacts.map(c => ({ ...c })); a[i][k] = v; setContacts(dbRec.id, a); };
       return { rec: dbRec, panel: {
         name: dbRec.name || "Untitled", sub: dbRec.sub || "No segment",
-        source: /kpmg/i.test(dbRec.sub || "") ? "KPMG longlist" : "Team-sourced",
+        source: /kpmg/i.test(dbRec.sub || "") ? "Advisor longlist" : "Team-sourced",
         isKpmg: /kpmg/i.test(dbRec.sub || ""),
         type: f("db:type"), hq: f("db:hq"), web: f("db:web"), fund: f("db:fund"), tick: f("db:tick"), ninv: f("db:ninv"),
         thesis: f("db:thesis"), port: f("db:port"), notes: f("db:notes"),
@@ -3414,7 +3509,7 @@ class Component extends DCLogic {
         dbNotes: dbF(r, "db:notes"),
         contactsSum: (() => { const c = getContacts(r); return c.length === 0 ? "+ Add" : (c[0].n || "Unnamed") + (c.length > 1 ? " +" + (c.length - 1) : ""); })(),
         onOpenRec: () => this.setState({ dbRecId: r.id }),
-        source: /kpmg/i.test(r.sub || "") ? "KPMG longlist" : "Team",
+        source: /kpmg/i.test(r.sub || "") ? "Advisor longlist" : "Team",
         isKpmg: /kpmg/i.test(r.sub || ""),
         carded: r.stage !== "Not set", notCarded: r.stage === "Not set",
         stage: r.stage,
@@ -3507,6 +3602,21 @@ class Component extends DCLogic {
 
     return {
       onLanding: !this.state.entered, showApp: !!this.state.entered,
+      needLogin: this.state.needLogin,
+      apiUserEmail: this.state.apiUser ? this.state.apiUser.email : "",
+      apiWorkspace: this.state.apiOrg ? this.state.apiOrg.name : "",
+      authIsSignup: this.state.authMode === "signup",
+      authEmail: this.state.authEmail, authPass: this.state.authPass, authName: this.state.authName,
+      authErr: this.state.authErr,
+      authTitle: this.state.authMode === "signup" ? "Create your account" : "Sign in to Q. OS",
+      authCta: this.state.authBusy ? "\u2026" : (this.state.authMode === "signup" ? "Create account" : "Sign in"),
+      authToggleText: this.state.authMode === "signup" ? "Have an account? Sign in" : "New here? Create an account",
+      onAuthEmail: (e) => this.setState({ authEmail: e.target.value }),
+      onAuthPass: (e) => this.setState({ authPass: e.target.value }),
+      onAuthName: (e) => this.setState({ authName: e.target.value }),
+      doAuth: () => this.doAuth(),
+      toggleAuthMode: () => this.setState({ authMode: this.state.authMode === "signup" ? "login" : "signup", authErr: "" }),
+      signOutApi: () => this.signOutApi(),
       enterApp: () => { try { sessionStorage.setItem("q_entered", "1"); } catch (e) {} this.setState({ entered: true }); },
       exitApp: () => { try { sessionStorage.setItem("q_entered", "0"); } catch (e) {} this.setState({ entered: false }); },
       rows, activeSheets: rows.filter(x => x.sheetCls === "show"), total, nav, round, coverage, closeDateText, todayLabel,
