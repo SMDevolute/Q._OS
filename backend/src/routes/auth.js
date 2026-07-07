@@ -37,6 +37,9 @@ export async function handleAuth(req, env, sub) {
       `INSERT INTO users (id, email, name, password_hash, email_verified, created_at, last_login_at)
        VALUES (?, ?, ?, ?, 0, ?, ?)`,
       id, email, name, await hashPassword(pw, env.SESSION_PEPPER), now(), now());
+    // Give every new user a personal workspace (org + owner membership) so the app
+    // always has an org to read/write. Without this, orgs=[] and Acquire stays local-only.
+    await createDefaultOrg(env, id, name, email);
     const { token } = await createSession(env, id, req);
     return json({ user: { id, email, name } }, 201, setCookie(token));
   }
@@ -127,6 +130,21 @@ export async function handleAuth(req, env, sub) {
 }
 
 // ── helpers ──
+// Create a personal workspace for a user and make them its owner.
+async function createDefaultOrg(env, userId, name, email) {
+  const orgId = newId();
+  const orgName = (name && name.trim()) ? `${name.trim()}'s workspace` : `${email.split("@")[0]}'s workspace`;
+  let slug = orgName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+  if (slug && await one(env, `SELECT id FROM organizations WHERE slug = ?`, slug)) slug = `${slug}-${orgId.slice(0, 6)}`;
+  await run(env,
+    `INSERT INTO organizations (id, name, slug, base_currency, engagement_status, created_at)
+     VALUES (?, ?, ?, 'EUR', 'active', ?)`, orgId, orgName, slug || null, now());
+  await run(env,
+    `INSERT INTO memberships (id, org_id, user_id, role, status, created_at)
+     VALUES (?, ?, ?, 'owner', 'active', ?)`, newId(), orgId, userId, now());
+  return orgId;
+}
+
 async function issueLink(env, email, purpose, extra = {}) {
   const raw = randomToken(32);
   await run(env,
