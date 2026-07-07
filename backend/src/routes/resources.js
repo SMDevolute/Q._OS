@@ -70,6 +70,37 @@ const ENTITIES = {
   },
 };
 
+// ── cross-tenant FK guard ──────────────────────────────────────────────────
+// Incoming FK ids come from the request body; a caller could reference another
+// org's rows. Validate every FK belongs to the caller's org before writing.
+const USER_FK = new Set(["owner_user_id", "author_id", "assignee_id", "created_by"]);
+const ENTITY_FK = { round_id: "rounds", firm_id: "firms", deal_id: "deals" };
+const SUBJECT_TABLE = { firm: "firms", contact: "contacts", deal: "deals", round: "rounds" };
+const SOFT_DELETE_TABLES = new Set(["rounds", "firms", "contacts", "deals", "notes", "folders", "files"]);
+
+async function fkExists(env, table, id, orgId) {
+  const soft = SOFT_DELETE_TABLES.has(table) ? " AND deleted_at IS NULL" : "";
+  return !!(await one(env, `SELECT 1 AS x FROM ${table} WHERE id = ? AND org_id = ?${soft}`, id, orgId));
+}
+async function userInOrg(env, userId, orgId) {
+  return !!(await one(env,
+    `SELECT 1 AS x FROM memberships WHERE user_id = ? AND org_id = ? AND status = 'active'`, userId, orgId));
+}
+// `fields` = the already-coerced body subset. `full` carries subject_type for polymorphic checks.
+async function validateFks(env, resource, fields, orgId, full) {
+  for (const [f, v] of Object.entries(fields)) {
+    if (v == null || v === "") continue;
+    if (USER_FK.has(f)) {
+      if (!await userInOrg(env, v, orgId)) throw new HttpError(400, `${f} is not a member of this workspace`);
+    } else if (ENTITY_FK[f]) {
+      if (!await fkExists(env, ENTITY_FK[f], v, orgId)) throw new HttpError(400, `${f} not found in this workspace`);
+    } else if (f === "subject_id" && (resource === "notes" || resource === "tasks")) {
+      const t = SUBJECT_TABLE[(full && full.subject_type) || fields.subject_type];
+      if (t && !await fkExists(env, t, v, orgId)) throw new HttpError(400, `subject_id not found in this workspace`);
+    }
+  }
+}
+
 function coerce(field, type, raw) {
   if (raw === null) return null;
   if (type === "s") { const s = String(raw); const max = field === "data" ? 200000 : 8000; if (s.length > max) throw new HttpError(400, `${field} too long`); return s; }
@@ -115,6 +146,7 @@ export async function handleResource(req, env, resource, rest, ctx) {
     const body = await readJson(req);
     const fields = pick(body, spec);
     for (const r of spec.required) if (fields[r] == null || fields[r] === "") throw new HttpError(400, `${r} is required`);
+    await validateFks(env, resource, fields, orgId, body);
     const id = newId(); const t = now();
     const row = { id, org_id: orgId, created_at: t, ...fields };
     if (spec.hasUpdatedAt) row.updated_at = t;
@@ -136,6 +168,7 @@ export async function handleResource(req, env, resource, rest, ctx) {
     if (!canWrite) throw new HttpError(403, "Read-only role");
     const body = await readJson(req);
     const fields = pick(body, spec);
+    await validateFks(env, resource, fields, orgId, body);
     const cols = Object.keys(fields);
     if (cols.length === 0) return json({ ok: true });
     if (spec.hasUpdatedAt) { fields.updated_at = now(); cols.push("updated_at"); }

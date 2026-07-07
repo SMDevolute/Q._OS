@@ -26,6 +26,8 @@ function setCookie(token) {
 export async function handleAuth(req, env, sub) {
   // POST /api/auth/signup  { email, name, password }
   if (sub === "signup" && req.method === "POST") {
+    const ip = req.headers.get("cf-connecting-ip") || "unknown";
+    await rateLimit(env, `signup:${ip}`, 10, 3600); // 10 new accounts / hour / IP
     const body = await readJson(req);
     const email = vEmail(body.email);
     const name = str(body.name, "name", { max: 120, required: false });
@@ -176,4 +178,4 @@ async function consumeToken(env, raw, purpose) {
   return rec;
 }
 
-export { issueLink, consumeToken, TOKEN_TTL };
+export { issueLink, consumeToken, TOKEN_TTL, rateLimit };

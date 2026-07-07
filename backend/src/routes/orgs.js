@@ -3,7 +3,7 @@ import { HttpError, json, readJson } from "../lib/http.js";
 import { one, run, all, now, str, email as vEmail } from "../lib/db.js";
 import { newId } from "../lib/crypto.js";
 import { getUser, requireUser, requireOrgRole } from "../lib/auth.js";
-import { issueLink, consumeToken } from "./auth.js";
+import { issueLink, consumeToken, rateLimit } from "./auth.js";
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
@@ -27,6 +27,8 @@ export async function handleOrgs(req, env, parts) {
   // POST /api/orgs  { name, legal_name?, base_currency? }  → create; caller becomes owner
   if (parts.length === 0 && req.method === "POST") {
     requireUser(user);
+    const ip = req.headers.get("cf-connecting-ip") || "unknown";
+    await rateLimit(env, `orgcreate:${ip}`, 20, 3600); // 20 workspaces / hour / IP
     const body = await readJson(req);
     const name = str(body.name, "name", { max: 160 });
     const legal = str(body.legal_name, "legal_name", { max: 200, required: false });
